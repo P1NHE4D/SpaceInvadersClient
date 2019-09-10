@@ -1,1 +1,65 @@
 /* You can add global styles to this file, and also import other style files */
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+@font-face {
+  font-family: "American Captain";
+  src: url('assets/fonts/american_captain-webfont.woff');
+}
+
+h1.main-title {
+  font-size: 88pt;
+  background: -webkit-linear-gradient(#FF0000, rgba(221, 0, 0, 0));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-family: "American Captain";
+  font-style: normal;
+  margin-bottom: 75px;
+}
+
+.btn-main-lg {
+  font-family: "American Captain";
+  background-color: rgba(255, 0, 0, 0.5);
+  color: #ffffff;
+  border: solid rgba(255, 0, 0, 0);
+  font-size: 28pt;
+  padding-bottom: 0;
+  padding-top: 0;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  width: 300px;
+}
+
+
+.btn-main-lg:hover {
+  background-color: rgba(41, 41, 41, 0.8);
+  color: #ffffff;
+  border: solid rgba(41, 41, 41, 0);
+}
+
+.earth-background {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background-image: url('assets/images/earth.jpeg');
+  background-size: cover;
+}
+
+.flex-container {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+
