@@ -249,29 +249,3 @@ export class Enemy {
     return this.yPos;
   }
 }
-
-export class CanvasBoundaries {
-
-  constructor(
-    private readonly left: number,
-    private readonly right: number,
-    private readonly upper: number,
-    private readonly lower: number
-  ) {}
-
-  public getLeft(): number {
-    return this.left;
-  }
-
-  public getRight(): number {
-    return this.right;
-  }
-
-  public getUpper(): number {
-    return this.upper;
-  }
-
-  public getLower(): number {
-    return this.lower;
-  }
-}
