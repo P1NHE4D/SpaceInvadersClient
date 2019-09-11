@@ -70,14 +70,15 @@ export class GameComponent implements OnInit {
     this.ctx.drawImage(this.playerOneImg, this.playerOne.getX(), this.playerOne.getY());
   }
 
+  // TODO: Add keys for playerTwo
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvents(event: KeyboardEvent): void {
     switch(event.key) {
       case("ArrowLeft"):
-        this.playerOne.moveLeft();
+        this.playerOne.move(Direction.LEFT);
         break;
       case("ArrowRight"):
-        this.playerOne.moveRight();
+        this.playerOne.move(Direction.RIGHT);
         break;
       case(" "):
         let bullet = new Bullet(this.playerOne.getCenteredX(), this.playerOne.getY(), 0);
@@ -89,6 +90,9 @@ export class GameComponent implements OnInit {
     }
   }
 
+  // TODO: Add playerTwo image
+  // TODO: Add enemy bullets
+  // TODO: Add enemies
   gameLoop = () => {
     requestAnimationFrame(this.gameLoop);
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
@@ -130,20 +134,21 @@ export class Battleship {
   }
 
   /**
-   * Moves the battleship to the left by a predefined value
+   * Moves the battleship in the desired direction by a predefined value
+   * @param direction Desired direction
    */
-  public moveLeft(): void {
-    if (this.xPos - 12 > this.leftBoundary) {
-      this.xPos -= 12;
-    }
-  }
-
-  /**
-   * Moves the battleship to the right by a predefined value
-   */
-  public moveRight(): void {
-    if (this.xPos + 12 < this.rightBoundary) {
-      this.xPos += 12;
+  public move(direction: Direction): void {
+    switch(direction) {
+      case Direction.LEFT:
+        if (this.xPos - 12 > this.leftBoundary) {
+          this.xPos -= 12;
+        }
+        break;
+      case Direction.RIGHT:
+        if (this.xPos + 12 < this.rightBoundary) {
+          this.xPos += 12;
+        }
+        break;
     }
   }
 
@@ -210,21 +215,23 @@ export class Bullet {
   /**
    * Returns the x-position of the bullet
    */
-  public getX() {
+  public getX(): number {
     return this.xPos;
   }
 
   /**
    * Returns the y-position of the bullet
    */
-  public getY() {
+  public getY(): number {
     return this.yPos;
   }
 }
 
 export enum Direction{
   DOWN,
-  UP
+  UP,
+  LEFT,
+  RIGHT
 }
 
 export class Enemy {
@@ -234,10 +241,7 @@ export class Enemy {
     private yPos: number
   ) {}
 
-  public fire() {
-  }
-
-  public move() {
+  public move(): void {
 
   }
 
@@ -245,7 +249,12 @@ export class Enemy {
     return this.xPos;
   }
 
-  public getY() {
+  public getY(): number {
     return this.yPos;
+  }
+
+  // TODO: Implement method
+  public getCenteredX(): number {
+    return 0;
   }
 }
