@@ -101,7 +101,7 @@ export class GameComponent implements OnInit {
         this.playerOne.move(Direction.RIGHT);
         break;
       case(" "):
-        let bullet = new Bullet(this.playerOne.getCenteredX(), this.playerOne.getY(), 0);
+        let bullet = new Bullet(this.playerOne.getCenteredX(), this.playerOne.getY(), this.bulletImg.width, this.bulletImg.height, 0);
         this.bullets.push(bullet);
         break;
       case("Enter"):
@@ -246,11 +246,15 @@ export class Bullet {
    * Instantiates a new bullet
    * @param xPos initial x-position of the bullet
    * @param yPos initial y-position of the bullet
+   * @param width width of the bullet
+   * @param height height of the bullet
    * @param boundary travel boundary of the bullet
    */
   constructor(
     private xPos: number,
     private yPos: number,
+    private width: number,
+    private height: number,
     private boundary: number
   ) {}
 
@@ -278,8 +282,15 @@ export class Bullet {
     }
   }
 
+  /**
+   * Checks if the bullet intersects with a game world object
+   * @param xPos x-position of game world object
+   * @param width width of game world object
+   * @param yPos y-position of game world object
+   * @param height height of game world object
+   */
   public intersectsWithObject(xPos: number, width: number, yPos: number, height: number) {
-    return this.xPos >= xPos && this.xPos <= xPos + width && this.yPos <= yPos && this.yPos >= yPos - height;
+    return this.xPos + this.width >= xPos && this.xPos <= xPos + width && this.yPos - this.height <= yPos && this.yPos >= yPos - height;
   }
 
   /**
@@ -299,15 +310,16 @@ export class Bullet {
 
 export class Enemy {
   private readonly movementSpeed: number = 6;
-  private cooldown: number = 10;
 
   /**
    * Instantiates a new enemy
    * @param xPos initial x-position of enemy
    * @param yPos initial y-position of enemy
-   * @param leftBoundary
-   * @param rightBoundary
-   * @param lowerBoundary
+   * @param width Width of the enemy
+   * @param height Height of the enemy
+   * @param leftBoundary Left boundary of game area
+   * @param rightBoundary Right boundary of game area
+   * @param lowerBoundary Lower boundary of game area
    */
   constructor(
     private xPos: number,
@@ -321,7 +333,8 @@ export class Enemy {
 
   /**
    * Moves the enemy in the desired direction by a predefined value
-   * @param direction
+   * @param direction Desired movement direction
+   * @requires direction != null
    */
   public move(direction: Direction): void {
     switch(direction) {
@@ -343,6 +356,11 @@ export class Enemy {
     }
   }
 
+  /**
+   * Checks if the enemy reached a boundary with respect to its current movement direction
+   * @param direction movement direction of the enemy
+   * @requires direction != null
+   */
   public boundaryReached(direction: Direction): boolean {
     switch(direction) {
       case Direction.RIGHT:
@@ -368,15 +386,24 @@ export class Enemy {
     return this.yPos;
   }
 
+  /**
+   * Returns width of enemy
+   */
   public getWidth(): number {
     return this.width;
   }
 
+  /**
+   * Returns height of enemy
+   */
   public getHeight(): number {
     return this.height;
   }
 }
 
+/**
+ * Enum used for indicating the movement direction of an object
+ */
 export enum Direction{
   DOWN,
   UP,
