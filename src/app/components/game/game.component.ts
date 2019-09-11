@@ -21,6 +21,7 @@ export class GameComponent implements OnInit {
   private enemyMovementDirection: Direction;
   private enemyReachedBoundary: boolean;
   private enemyMovementCooldown: number;
+  private enemyFireCooldown: number;
 
 
   constructor() {
@@ -33,6 +34,7 @@ export class GameComponent implements OnInit {
     this.ctx.canvas.height = 400;
     this.enemyMovementDirection = Direction.RIGHT;
     this.enemyMovementCooldown = 15;
+    this.enemyFireCooldown = 45;
     this.enemyReachedBoundary = false;
     this.loadImages();
   }
@@ -129,6 +131,14 @@ export class GameComponent implements OnInit {
       this.ctx.drawImage(this.bulletImg, bullet.getX(), bullet.getY());
     }
 
+    for(let bullet of this.enemyBullets) {
+      bullet.move(Direction.DOWN, () => {
+        let index = this.enemyBullets.indexOf(bullet);
+        this.enemyBullets.splice(index, 1);
+      });
+      this.ctx.drawImage(this.enemyBulletImg, bullet.getX(), bullet.getY());
+    }
+
 
     //Check for bullet intersection
     for(let bullet of this.bullets) {
@@ -167,6 +177,22 @@ export class GameComponent implements OnInit {
           enemy.move(this.enemyMovementDirection);
         }
       }
+    }
+
+    // Enemy fire
+    if ((this.enemyFireCooldown -= 1) === 0) {
+      this.enemyFireCooldown = 45;
+
+      let randomIndex = Math.floor(Math.random() * this.enemies.length);
+      let randomEnemy = this.enemies[randomIndex];
+      let bullet = new Bullet(
+        randomEnemy.getX() + (randomEnemy.getWidth() / 2),
+        randomEnemy.getY(),
+        this.enemyBulletImg.width,
+        this.enemyBulletImg.height,
+        this.ctx.canvas.height
+      );
+      this.enemyBullets.push(bullet);
     }
 
     for (let enemy of this.enemies) {
