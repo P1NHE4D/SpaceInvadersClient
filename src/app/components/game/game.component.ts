@@ -1,9 +1,16 @@
 import {Component, HostListener, OnInit} from '@angular/core';
+import {GameLogicService} from "../../services/game-logic.service";
+import {GameSetupService} from "../../services/game-setup.service";
+import {Bullet} from "../../materials/Bullet";
+import {Battleship} from "../../materials/Battleship";
+import {Direction} from "../../enums/direction";
+import {Enemy} from "../../materials/Enemy";
 
 @Component({
   selector: 'app-game',
   templateUrl: './game.component.html',
-  styleUrls: ['./game.component.css']
+  styleUrls: ['./game.component.css'],
+  providers: [GameLogicService, GameSetupService]
 })
 export class GameComponent implements OnInit {
 
@@ -24,7 +31,7 @@ export class GameComponent implements OnInit {
   private enemyFireCooldown: number;
 
 
-  constructor() {
+  constructor(private gameLogic: GameLogicService) {
   }
 
   ngOnInit() {
@@ -71,9 +78,10 @@ export class GameComponent implements OnInit {
     this.playerOne = new Battleship(
       this.ctx.canvas.width / 2,
       this.ctx.canvas.height,
+      this.playerOneImg.width,
+      this.playerOneImg.height,
       0,
       this.ctx.canvas.width,
-      this.playerOneImg
     );
     this.ctx.drawImage(this.playerOneImg, this.playerOne.getX(), this.playerOne.getY());
     this.enemies = [];
@@ -103,7 +111,7 @@ export class GameComponent implements OnInit {
         this.playerOne.move(Direction.RIGHT);
         break;
       case(" "):
-        let bullet = new Bullet(this.playerOne.getCenteredX(), this.playerOne.getY(), this.bulletImg.width, this.bulletImg.height, 0);
+        let bullet = new Bullet(this.playerOne.getX() + (this.playerOne.getWidth() / 2), this.playerOne.getY(), this.bulletImg.width, this.bulletImg.height, 0);
         this.bullets.push(bullet);
         break;
       case("Enter"):
@@ -201,238 +209,4 @@ export class GameComponent implements OnInit {
 
   };
 
-}
-
-export class Battleship {
-
-  /**
-   * Instantiates a new battleship
-   * @param xPos initial y-position of the battleship
-   * @param yPos initial x-position of the battleship
-   * @param leftBoundary left game boundary
-   * @param rightBoundary right game boundary
-   * @param img image used for the battleship
-   */
-  constructor(
-    private xPos: number,
-    private yPos: number,
-    private readonly leftBoundary: number,
-    private readonly rightBoundary: number,
-    private img: HTMLImageElement
-  ) {
-    this.rightBoundary -= this.img.width;
-    this.xPos -= (this.img.width / 2);
-    this.yPos -= this.img.height;
-  }
-
-  /**
-   * Moves the battleship in the desired direction by a predefined value
-   * @param direction Desired direction
-   */
-  public move(direction: Direction): void {
-    switch(direction) {
-      case Direction.LEFT:
-        if (this.xPos - 12 > this.leftBoundary) {
-          this.xPos -= 12;
-        }
-        break;
-      case Direction.RIGHT:
-        if (this.xPos + 12 < this.rightBoundary) {
-          this.xPos += 12;
-        }
-        break;
-    }
-  }
-
-  /**
-   * Returns x-position of battleship
-   */
-  public getX(): number {
-    return this.xPos;
-  }
-
-  /**
-   * Returns y-position of battleship
-   */
-  public getY(): number {
-    return this.yPos;
-  }
-
-  /**
-   * Returns x-position of battleship adjusted by image size
-   */
-  public getCenteredX(): number {
-    return this.xPos + (this.img.width / 2);
-  }
-}
-
-export class Bullet {
-
-  /**
-   * Instantiates a new bullet
-   * @param xPos initial x-position of the bullet
-   * @param yPos initial y-position of the bullet
-   * @param width width of the bullet
-   * @param height height of the bullet
-   * @param boundary travel boundary of the bullet
-   */
-  constructor(
-    private xPos: number,
-    private yPos: number,
-    private width: number,
-    private height: number,
-    private boundary: number
-  ) {}
-
-  /**
-   * Moves in the desired direction by a predefined value
-   * @param direction Direction in which the bullet is supposed to travel
-   * @param boundaryReached Function that should be called as soon as the bullet reaches the boundary
-   */
-  move(direction: Direction, boundaryReached: () => any): void {
-    switch(direction) {
-      case Direction.UP:
-        if (this.yPos - 3 > this.boundary) {
-          this.yPos -= 3;
-        } else {
-          boundaryReached();
-        }
-        break;
-      case Direction.DOWN:
-        if (this.yPos + 3 < this.boundary) {
-          this.yPos += 3;
-        } else {
-          boundaryReached();
-        }
-        break;
-    }
-  }
-
-  /**
-   * Checks if the bullet intersects with a game world object
-   * @param xPos x-position of game world object
-   * @param width width of game world object
-   * @param yPos y-position of game world object
-   * @param height height of game world object
-   */
-  public intersectsWithObject(xPos: number, width: number, yPos: number, height: number) {
-    return this.xPos + this.width >= xPos && this.xPos <= xPos + width && this.yPos - this.height <= yPos && this.yPos >= yPos - height;
-  }
-
-  /**
-   * Returns the x-position of the bullet
-   */
-  public getX(): number {
-    return this.xPos;
-  }
-
-  /**
-   * Returns the y-position of the bullet
-   */
-  public getY(): number {
-    return this.yPos;
-  }
-}
-
-export class Enemy {
-  private readonly movementSpeed: number = 6;
-
-  /**
-   * Instantiates a new enemy
-   * @param xPos initial x-position of enemy
-   * @param yPos initial y-position of enemy
-   * @param width Width of the enemy
-   * @param height Height of the enemy
-   * @param leftBoundary Left boundary of game area
-   * @param rightBoundary Right boundary of game area
-   * @param lowerBoundary Lower boundary of game area
-   */
-  constructor(
-    private xPos: number,
-    private yPos: number,
-    private width: number,
-    private height: number,
-    private leftBoundary: number,
-    private rightBoundary: number,
-    private lowerBoundary: number
-  ) {}
-
-  /**
-   * Moves the enemy in the desired direction by a predefined value
-   * @param direction Desired movement direction
-   * @requires direction != null
-   */
-  public move(direction: Direction): void {
-    switch(direction) {
-      case Direction.RIGHT:
-        if (this.xPos + this.movementSpeed < this.rightBoundary) {
-          this.xPos += this.movementSpeed;
-        }
-        break;
-      case Direction.LEFT:
-        if (this.xPos - this.movementSpeed > this.leftBoundary) {
-          this.xPos -= this.movementSpeed;
-        }
-        break;
-      case Direction.DOWN:
-        if (this.yPos + this.movementSpeed < this.lowerBoundary) {
-          this.yPos += this.movementSpeed;
-        }
-        break;
-    }
-  }
-
-  /**
-   * Checks if the enemy reached a boundary with respect to its current movement direction
-   * @param direction movement direction of the enemy
-   * @requires direction != null
-   */
-  public boundaryReached(direction: Direction): boolean {
-    switch(direction) {
-      case Direction.RIGHT:
-        return this.xPos + this.movementSpeed >= this.rightBoundary;
-      case Direction.LEFT:
-        return this.xPos - this.movementSpeed <= this.leftBoundary;
-      case Direction.DOWN:
-        return this.yPos + this.movementSpeed >= this.lowerBoundary;
-    }
-  }
-
-  /**
-   * Returns x-position of enemy
-   */
-  public getX(): number {
-    return this.xPos;
-  }
-
-  /**
-   * Returns y-position of enemy
-   */
-  public getY(): number {
-    return this.yPos;
-  }
-
-  /**
-   * Returns width of enemy
-   */
-  public getWidth(): number {
-    return this.width;
-  }
-
-  /**
-   * Returns height of enemy
-   */
-  public getHeight(): number {
-    return this.height;
-  }
-}
-
-/**
- * Enum used for indicating the movement direction of an object
- */
-export enum Direction{
-  DOWN,
-  UP,
-  LEFT,
-  RIGHT
 }
