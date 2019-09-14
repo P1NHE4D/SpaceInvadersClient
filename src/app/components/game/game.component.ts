@@ -1,9 +1,10 @@
 import {AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild} from '@angular/core';
-import {Bullet} from "../../materials/Bullet";
-import {Battleship} from "../../materials/Battleship";
+import {Bullet} from "../../game-objects/Bullet";
+import {Battleship} from "../../game-objects/Battleship";
 import {Direction} from "../../enums/direction";
-import {Enemy} from "../../materials/Enemy";
+import {Enemy} from "../../game-objects/Enemy";
 import {LoaderService} from "../../services/loader.service";
+import {GameBoundaries} from "../../game-objects/GameObject";
 
 @Component({
   selector: 'app-game',
@@ -19,80 +20,94 @@ export class GameComponent implements OnInit, AfterViewInit {
   private bullets: Bullet[];
   private enemyBullets: Bullet[];
   private enemies: Enemy[];
-  private playerOneImg: HTMLImageElement;
-  private bulletImg: HTMLImageElement;
-  private enemyBulletImg: HTMLImageElement;
-  private androidAlienImg: HTMLImageElement;
-  private loadedImages = new Map();
   private enemyMovementDirection: Direction;
   private enemyReachedBoundary: boolean;
   private enemyMovementCooldown: number;
   private enemyFireCooldown: number;
   private gameOver: boolean;
+  private gameBoundaries: GameBoundaries;
+  private loadedImages: Map<string, HTMLImageElement>;
 
 
-  constructor(private loader: LoaderService) {
-  }
+  constructor(private loader: LoaderService) {}
 
   ngOnInit() {
     const canvasEl: HTMLCanvasElement = this.canvas.nativeElement;
     this.ctx = canvasEl.getContext('2d');
     this.ctx.canvas.width = 700;
     this.ctx.canvas.height = 400;
+    this.gameBoundaries = {
+      leftBoundary: 0,
+      rightBoundary: this.ctx.canvas.width,
+      lowerBoundary: this.ctx.canvas.height,
+      upperBoundary: 0
+    };
     this.enemyMovementDirection = Direction.RIGHT;
     this.enemyMovementCooldown = 15;
-    this.enemyFireCooldown = 45;
+    this.enemyFireCooldown = 60;
     this.enemyReachedBoundary = false;
-    this.loader.resourcesLoaded$.subscribe( () => {
-      this.setupGame();
-    });
+    this.bullets = [];
+    this.enemyBullets = [];
+    this.enemies = [];
   }
 
   ngAfterViewInit() {
+    this.loader.resourcesLoaded$.subscribe( () => {
+      this.loadedImages = this.loader.getImages();
+      this.setupGame();
+    });
+    this.loadFiles();
   }
 
   /**
    * Load game assets
    */
   loadFiles(): void {
+    this.ctx.fillStyle = "#FFFFFF";
+    this.ctx.font = "24pt Impact";
+    this.ctx.fillText("Loading...", 200, 200);
     this.loader.preload([
       {name: 'RedFighter', type: 'image', src: '/assets/gameObjects/RedFighter.png'},
       {name: 'Bullet', type: 'image', src: '/assets/gameObjects/Bullet.png'},
       {name: 'EnemyBullet', type: 'image', src: '/assets/gameObjects/EnemyBullet.png'},
-      {name: 'AndroidAlien', type: 'image', src: '/assets/gameObjects/AndroidAlien.png'}
+      {name: 'Android', type: 'image', src: '/assets/gameObjects/AndroidAlien.png'},
+      {name: 'Squid', type: 'image', src: '/assets/gameObjects/SquidAlien.png'},
+      {name: 'Death', type: 'image', src: '/assets/gameObjects/DeathAlien.png'},
     ]);
   }
 
   setupGame(): void {
-    this.loadedImages = this.loader.getImages();
-    this.androidAlienImg = this.loadedImages.get("AndroidAlien");
-    this.playerOneImg = this.loadedImages.get("RedFighter");
-    this.bulletImg = this.loadedImages.get("Bullet");
-    this.enemyBulletImg = this.loadedImages.get("EnemyBullet");
-    this.ctx.fillStyle = "#FFFFFF";
+    this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+    this.ctx.fillStyle = "#FF0000";
     this.ctx.font = "24pt Impact";
     this.ctx.fillText("Press 'ENTER' to start the game", 100, 100);
-    this.bullets = [];
-    this.enemyBullets = [];
     this.playerOne = new Battleship(
+      this.loadedImages.get('RedFighter'),
       this.ctx.canvas.width / 2,
       this.ctx.canvas.height,
-      this.playerOneImg.width,
-      this.playerOneImg.height,
-      0,
-      this.ctx.canvas.width,
+      this.gameBoundaries
     );
-    this.ctx.drawImage(this.playerOneImg, this.playerOne.getX(), this.playerOne.getY());
-    this.enemies = [];
-    let rowSize: number = (this.ctx.canvas.width - (this.ctx.canvas.width % this.androidAlienImg.width) - 2 * this.androidAlienImg.width);
-    let enemiesPerRow: number =  rowSize / (this.androidAlienImg.width + 10);
 
     // Spawn enemies
     for (let j = 0; j < 4; ++j) {
-      let y: number = (this.androidAlienImg.width + 10) * j;
+      let img: HTMLImageElement;
+      switch(j % 3) {
+        case 0:
+          img = this.loadedImages.get('Android');
+          break;
+        case 1:
+          img = this.loadedImages.get('Squid');
+          break;
+        case 2:
+          img = this.loadedImages.get('Death');
+          break;
+      }
+      let enemiesPerRow: number =  15;
+
+      let y: number = (img.width + 10) * j;
       for (let i = 0; i < enemiesPerRow; ++i) {
-        let x: number = this.androidAlienImg.width + (this.androidAlienImg.width + 10) * i;
-        let enemy = new Enemy(x, y, this.androidAlienImg.width, this.androidAlienImg.height, 0, this.ctx.canvas.width - this.androidAlienImg.width, this.ctx.canvas.height - this.androidAlienImg.height);
+        let x: number = img.width + (img.width + 10) * i;
+        let enemy = new Enemy(img, x, y, this.gameBoundaries);
         this.enemies.push(enemy);
       }
     }
@@ -110,7 +125,7 @@ export class GameComponent implements OnInit, AfterViewInit {
         this.playerOne.move(Direction.RIGHT);
         break;
       case(" "):
-        let bullet = new Bullet(this.playerOne.getX() + (this.playerOne.getWidth() / 2), this.playerOne.getY(), this.bulletImg.width, this.bulletImg.height, 0);
+        let bullet = new Bullet(this.loadedImages.get('Bullet'), this.playerOne.getX() + (this.playerOne.getWidth() / 2), this.playerOne.getY(), this.gameBoundaries);
         this.bullets.push(bullet);
         break;
       case("Enter"):
@@ -119,9 +134,6 @@ export class GameComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // TODO: Add playerTwo image
-  // TODO: Add enemy bullets
-  // TODO: Add enemies
   gameLoop = () => {
     if (this.gameOver) {
       this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
@@ -134,7 +146,13 @@ export class GameComponent implements OnInit, AfterViewInit {
 
     // Player movement
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-    this.ctx.drawImage(this.playerOneImg, this.playerOne.getX(), this.playerOne.getY());
+
+    // Draw objects
+    this.playerOne.draw(this.ctx);
+    for (let enemy of this.enemies) {
+      enemy.draw(this.ctx);
+    }
+
 
     // Bullet movement
     for(let bullet of this.bullets) {
@@ -142,7 +160,7 @@ export class GameComponent implements OnInit, AfterViewInit {
         let index = this.bullets.indexOf(bullet);
         this.bullets.splice(index, 1);
       });
-      this.ctx.drawImage(this.bulletImg, bullet.getX(), bullet.getY());
+      bullet.draw(this.ctx);
     }
 
     for(let bullet of this.enemyBullets) {
@@ -150,7 +168,7 @@ export class GameComponent implements OnInit, AfterViewInit {
         let index = this.enemyBullets.indexOf(bullet);
         this.enemyBullets.splice(index, 1);
       });
-      this.ctx.drawImage(this.enemyBulletImg, bullet.getX(), bullet.getY());
+      bullet.draw(this.ctx);
     }
 
     //Check for bullet intersection
@@ -200,22 +218,17 @@ export class GameComponent implements OnInit, AfterViewInit {
 
     // Enemy fire
     if ((this.enemyFireCooldown -= 1) === 0) {
-      this.enemyFireCooldown = 45;
+      this.enemyFireCooldown = 60;
 
       let randomIndex = Math.floor(Math.random() * this.enemies.length);
       let randomEnemy = this.enemies[randomIndex];
       let bullet = new Bullet(
+        this.loadedImages.get('EnemyBullet'),
         randomEnemy.getX() + (randomEnemy.getWidth() / 2),
         randomEnemy.getY(),
-        this.enemyBulletImg.width,
-        this.enemyBulletImg.height,
-        this.ctx.canvas.height
+        this.gameBoundaries
       );
       this.enemyBullets.push(bullet);
-    }
-
-    for (let enemy of this.enemies) {
-      this.ctx.drawImage(this.androidAlienImg, enemy.getX(), enemy.getY());
     }
 
     if (this.enemies.length === 0) {

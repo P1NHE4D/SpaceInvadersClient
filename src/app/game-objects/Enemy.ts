@@ -1,4 +1,4 @@
-import {GameObject} from "./GameObject";
+import {GameBoundaries, GameObject} from "./GameObject";
 import {Direction} from "../enums/direction";
 
 export class Enemy extends GameObject {
@@ -6,24 +6,18 @@ export class Enemy extends GameObject {
 
   /**
    * Instantiates a new enemy
+   * @param image image that depicts the enemy
    * @param xPos initial x-position of enemy
    * @param yPos initial y-position of enemy
-   * @param width Width of the enemy
-   * @param height Height of the enemy
-   * @param leftBoundary Left boundary of game area
-   * @param rightBoundary Right boundary of game area
-   * @param lowerBoundary Lower boundary of game area
+   * @param boundaries boundaries of the canvas
    */
   constructor(
+    image: HTMLImageElement,
     xPos: number,
     yPos: number,
-    width: number,
-    height: number,
-    private leftBoundary: number,
-    private rightBoundary: number,
-    private lowerBoundary: number,
+    boundaries: GameBoundaries,
   ) {
-    super(xPos, yPos, width, height);
+    super(image, xPos, yPos, boundaries);
   }
 
   /**
@@ -33,17 +27,17 @@ export class Enemy extends GameObject {
   public move(direction: Direction): void {
     switch(direction) {
       case Direction.RIGHT:
-        if (this.xPos + this.movementSpeed < this.rightBoundary) {
+        if (this.xPos + this.movementSpeed < this.boundaries.rightBoundary) {
           this.xPos += this.movementSpeed;
         }
         break;
       case Direction.LEFT:
-        if (this.xPos - this.movementSpeed > this.leftBoundary) {
+        if (this.xPos - this.movementSpeed > this.boundaries.leftBoundary) {
           this.xPos -= this.movementSpeed;
         }
         break;
       case Direction.DOWN:
-        if (this.yPos + this.movementSpeed < this.lowerBoundary) {
+        if (this.yPos + this.movementSpeed < this.boundaries.lowerBoundary) {
           this.yPos += this.movementSpeed;
         }
         break;
@@ -57,15 +51,12 @@ export class Enemy extends GameObject {
   public boundaryReached(direction: Direction): boolean {
     switch(direction) {
       case Direction.RIGHT:
-        return this.xPos + this.movementSpeed >= this.rightBoundary;
+        return this.xPos + this.movementSpeed >= this.boundaries.rightBoundary;
       case Direction.LEFT:
-        return this.xPos - this.movementSpeed <= this.leftBoundary;
+        return this.xPos - this.movementSpeed <= this.boundaries.leftBoundary;
       case Direction.DOWN:
-        return this.yPos + this.movementSpeed >= this.lowerBoundary;
+        return this.yPos + this.movementSpeed >= this.boundaries.lowerBoundary;
     }
-  }
-
-  draw(): void {
   }
 
 }

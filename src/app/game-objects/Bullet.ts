@@ -1,24 +1,22 @@
-import {GameObject} from "./GameObject";
+import {GameBoundaries, GameObject} from "./GameObject";
 import {Direction} from "../enums/direction";
 
 export class Bullet extends GameObject {
 
   /**
    * Instantiates a new bullet
+   * @param image image that depicts the bullet
    * @param xPos initial x-position of the bullet
    * @param yPos initial y-position of the bullet
-   * @param width width of the bullet
-   * @param height height of the bullet
-   * @param boundary travel boundary of the bullet
+   * @param boundaries boundaries of the canvas
    */
   constructor(
+    image: HTMLImageElement,
     xPos: number,
     yPos: number,
-    width: number,
-    height: number,
-    private boundary: number
+    boundaries: GameBoundaries,
   ) {
-    super(xPos, yPos, width, height);
+    super(image, xPos, yPos, boundaries);
   }
 
   /**
@@ -29,14 +27,14 @@ export class Bullet extends GameObject {
   move(direction: Direction, boundaryReached: () => any): void {
     switch(direction) {
       case Direction.UP:
-        if (this.yPos - 3 > this.boundary) {
+        if (this.yPos - 3 > this.boundaries.upperBoundary) {
           this.yPos -= 3;
         } else {
           boundaryReached();
         }
         break;
       case Direction.DOWN:
-        if (this.yPos + 3 < this.boundary) {
+        if (this.yPos + 3 < this.boundaries.lowerBoundary) {
           this.yPos += 3;
         } else {
           boundaryReached();

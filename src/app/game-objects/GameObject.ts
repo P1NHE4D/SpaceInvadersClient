@@ -1,18 +1,30 @@
 export class GameObject {
-
+  protected width: number;
+  protected height: number;
   /**
    * Instantiates a new game object
+   * @param image image that depicts the game object
    * @param xPos initial x-position of the game object
    * @param yPos initial y-position of the game object
-   * @param width width of the game object
-   * @param height height of the game object
+   * @param boundaries boundaries of the canvas
    * */
   constructor(
+    private image: HTMLImageElement,
     protected xPos: number,
     protected yPos: number,
-    protected width: number,
-    protected height: number
-  ) {}
+    protected boundaries: GameBoundaries
+
+  ) {
+    this.width = image.width;
+    this.height = image.height;
+  }
+
+  /**
+   * Draws the game object on the canvas according to its current x- and y-values
+   */
+  draw(ctx: CanvasRenderingContext2D): void {
+    ctx.drawImage(this.image, this.xPos, this.yPos);
+  }
 
   /**
    * @return Returns x-position of game object
@@ -42,4 +54,11 @@ export class GameObject {
     return this.height;
   }
 
+}
+
+export interface GameBoundaries {
+  leftBoundary: number;
+  rightBoundary: number;
+  upperBoundary: number;
+  lowerBoundary: number;
 }
