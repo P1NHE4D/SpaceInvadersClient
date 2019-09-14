@@ -53,7 +53,13 @@ export class Bullet extends GameObject {
    * @param height height of game world object
    */
   public intersectsWithObject(xPos: number, width: number, yPos: number, height: number) {
-    return this.xPos + this.width >= xPos && this.xPos <= xPos + width && this.yPos - this.height <= yPos && this.yPos >= yPos - height;
+    return (
+        (this.xPos <= xPos + width && this.xPos >= xPos) ||
+        (this.xPos + this.width >= xPos && this.xPos + this.width <= xPos + width)
+      ) && (
+        (this.yPos <= yPos + height && this.yPos >= yPos) ||
+        (this.yPos + this.height >= yPos && this.yPos + this.height <= yPos + height)
+      )
   }
 
 }

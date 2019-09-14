@@ -21,7 +21,7 @@ export class Enemy extends GameObject {
     height: number,
     private leftBoundary: number,
     private rightBoundary: number,
-    private lowerBoundary: number
+    private lowerBoundary: number,
   ) {
     super(xPos, yPos, width, height);
   }
@@ -63,6 +63,9 @@ export class Enemy extends GameObject {
       case Direction.DOWN:
         return this.yPos + this.movementSpeed >= this.lowerBoundary;
     }
+  }
+
+  draw(): void {
   }
 
 }

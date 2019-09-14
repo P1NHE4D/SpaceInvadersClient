@@ -1,20 +1,19 @@
-import {Component, HostListener, OnInit} from '@angular/core';
-import {GameLogicService} from "../../services/game-logic.service";
-import {GameSetupService} from "../../services/game-setup.service";
+import {AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild} from '@angular/core';
 import {Bullet} from "../../materials/Bullet";
 import {Battleship} from "../../materials/Battleship";
 import {Direction} from "../../enums/direction";
 import {Enemy} from "../../materials/Enemy";
+import {LoaderService} from "../../services/loader.service";
 
 @Component({
   selector: 'app-game',
   templateUrl: './game.component.html',
   styleUrls: ['./game.component.css'],
-  providers: [GameLogicService, GameSetupService]
 })
-export class GameComponent implements OnInit {
+export class GameComponent implements OnInit, AfterViewInit {
+  @ViewChild('canvas', { static: true })
+  canvas: ElementRef;
 
-  private canvas;
   private ctx: CanvasRenderingContext2D;
   private playerOne: Battleship;
   private bullets: Bullet[];
@@ -24,52 +23,52 @@ export class GameComponent implements OnInit {
   private bulletImg: HTMLImageElement;
   private enemyBulletImg: HTMLImageElement;
   private androidAlienImg: HTMLImageElement;
-  private images: HTMLImageElement[];
+  private loadedImages = new Map();
   private enemyMovementDirection: Direction;
   private enemyReachedBoundary: boolean;
   private enemyMovementCooldown: number;
   private enemyFireCooldown: number;
+  private gameOver: boolean;
 
 
-  constructor(private gameLogic: GameLogicService) {
+  constructor(private loader: LoaderService) {
   }
 
   ngOnInit() {
-    this.canvas = document.getElementById('canvas');
-    this.ctx = this.canvas.getContext('2d');
+    const canvasEl: HTMLCanvasElement = this.canvas.nativeElement;
+    this.ctx = canvasEl.getContext('2d');
     this.ctx.canvas.width = 700;
     this.ctx.canvas.height = 400;
     this.enemyMovementDirection = Direction.RIGHT;
     this.enemyMovementCooldown = 15;
     this.enemyFireCooldown = 45;
     this.enemyReachedBoundary = false;
-    this.loadImages();
+    this.loader.resourcesLoaded$.subscribe( () => {
+      this.setupGame();
+    });
+  }
+
+  ngAfterViewInit() {
   }
 
   /**
    * Load game assets
    */
-  loadImages(): void {
-    this.images = [
-      this.playerOneImg = new Image(),
-      this.bulletImg = new Image(),
-      this.enemyBulletImg = new Image(),
-      this.androidAlienImg = new Image(),
-    ];
-    this.playerOneImg.src = "../../../assets/gameObjects/RedFighter.png";
-    this.bulletImg.src = "../../../assets/gameObjects/Bullet.png";
-    this.enemyBulletImg.src = "../../../assets/gameObjects/EnemyBullet.png";
-    this.androidAlienImg.src = "../../../assets/gameObjects/AndroidAlien.png";
-    for (let i = 0; i < this.images.length; ++i) {
-      this.images[i].onload = () => {
-        if (i === this.images.length - 1) {
-          this.setupGame();
-        }
-      }
-    }
+  loadFiles(): void {
+    this.loader.preload([
+      {name: 'RedFighter', type: 'image', src: '/assets/gameObjects/RedFighter.png'},
+      {name: 'Bullet', type: 'image', src: '/assets/gameObjects/Bullet.png'},
+      {name: 'EnemyBullet', type: 'image', src: '/assets/gameObjects/EnemyBullet.png'},
+      {name: 'AndroidAlien', type: 'image', src: '/assets/gameObjects/AndroidAlien.png'}
+    ]);
   }
 
-  setupGame() {
+  setupGame(): void {
+    this.loadedImages = this.loader.getImages();
+    this.androidAlienImg = this.loadedImages.get("AndroidAlien");
+    this.playerOneImg = this.loadedImages.get("RedFighter");
+    this.bulletImg = this.loadedImages.get("Bullet");
+    this.enemyBulletImg = this.loadedImages.get("EnemyBullet");
     this.ctx.fillStyle = "#FFFFFF";
     this.ctx.font = "24pt Impact";
     this.ctx.fillText("Press 'ENTER' to start the game", 100, 100);
@@ -124,6 +123,13 @@ export class GameComponent implements OnInit {
   // TODO: Add enemy bullets
   // TODO: Add enemies
   gameLoop = () => {
+    if (this.gameOver) {
+      this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+      this.ctx.fillStyle = "#FFFFFF";
+      this.ctx.font = "24pt Impact";
+      this.ctx.fillText("GAME OVER", 100, 100);
+      return;
+    }
     requestAnimationFrame(this.gameLoop);
 
     // Player movement
@@ -147,7 +153,6 @@ export class GameComponent implements OnInit {
       this.ctx.drawImage(this.enemyBulletImg, bullet.getX(), bullet.getY());
     }
 
-
     //Check for bullet intersection
     for(let bullet of this.bullets) {
       for(let enemy of this.enemies) {
@@ -157,6 +162,12 @@ export class GameComponent implements OnInit {
           index = this.bullets.indexOf(bullet);
           this.bullets.splice(index, 1);
         }
+      }
+    }
+
+    for(let bullet of this.enemyBullets) {
+      if(bullet.intersectsWithObject(this.playerOne.getX(), this.playerOne.getWidth(), this.playerOne.getY(), this.playerOne.getHeight())) {
+        this.gameOver = true;
       }
     }
 
@@ -205,6 +216,10 @@ export class GameComponent implements OnInit {
 
     for (let enemy of this.enemies) {
       this.ctx.drawImage(this.androidAlienImg, enemy.getX(), enemy.getY());
+    }
+
+    if (this.enemies.length === 0) {
+      this.gameOver = true;
     }
 
   };
