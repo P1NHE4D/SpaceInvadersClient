@@ -1,5 +1,4 @@
-import {GameBoundaries, GameObject} from "./GameObject";
-import {Direction} from "../enums/direction";
+import {Direction, GameBoundaries, GameObject} from "./GameObject";
 
 export class Battleship extends GameObject {
   private movementSpeed = 10;

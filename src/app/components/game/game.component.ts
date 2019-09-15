@@ -1,17 +1,16 @@
-import {AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, HostListener, OnInit, ViewChild} from '@angular/core';
 import {Bullet} from "../../game-objects/Bullet";
 import {Battleship} from "../../game-objects/Battleship";
-import {Direction} from "../../enums/direction";
 import {Enemy} from "../../game-objects/Enemy";
 import {LoaderService} from "../../services/loader.service";
-import {GameBoundaries} from "../../game-objects/GameObject";
+import {Direction, GameBoundaries} from "../../game-objects/GameObject";
 
 @Component({
   selector: 'app-game',
   templateUrl: './game.component.html',
   styleUrls: ['./game.component.css'],
 })
-export class GameComponent implements OnInit, AfterViewInit {
+export class GameComponent implements OnInit {
   @ViewChild('canvas', { static: true })
   canvas: ElementRef;
 
@@ -49,15 +48,13 @@ export class GameComponent implements OnInit, AfterViewInit {
     this.bullets = [];
     this.enemyBullets = [];
     this.enemies = [];
-  }
-
-  ngAfterViewInit() {
     this.loader.resourcesLoaded$.subscribe( () => {
       this.loadedImages = this.loader.getImages();
       this.setupGame();
     });
     this.loadFiles();
   }
+
 
   /**
    * Load game assets
@@ -114,19 +111,19 @@ export class GameComponent implements OnInit, AfterViewInit {
 
   }
 
-  // TODO: Add keys for playerTwo
+  // TODO: Improve key handling to improve overall gameplay experience and smoothness
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvents(event: KeyboardEvent): void {
     switch(event.key) {
+      case(" "):
+        let bullet = new Bullet(this.loadedImages.get('Bullet'), this.playerOne.getX() + (this.playerOne.getWidth() / 2), this.playerOne.getY(), this.gameBoundaries);
+        this.bullets.push(bullet);
+        break;
       case("ArrowLeft"):
         this.playerOne.move(Direction.LEFT);
         break;
       case("ArrowRight"):
         this.playerOne.move(Direction.RIGHT);
-        break;
-      case(" "):
-        let bullet = new Bullet(this.loadedImages.get('Bullet'), this.playerOne.getX() + (this.playerOne.getWidth() / 2), this.playerOne.getY(), this.gameBoundaries);
-        this.bullets.push(bullet);
         break;
       case("Enter"):
         this.gameLoop();
