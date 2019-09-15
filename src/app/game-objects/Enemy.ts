@@ -9,22 +9,23 @@ export class Enemy extends GameObject {
    * @param xPos initial x-position of enemy
    * @param yPos initial y-position of enemy
    * @param boundaries boundaries of the canvas
+   * @param movementDirection movement direction of the enemy
    */
   constructor(
     image: HTMLImageElement,
     xPos: number,
     yPos: number,
     boundaries: GameBoundaries,
+    private movementDirection: Direction
   ) {
     super(image, xPos, yPos, boundaries);
   }
 
   /**
    * Moves the enemy in the desired direction by a predefined value
-   * @param direction Desired movement direction
    */
-  public move(direction: Direction): void {
-    switch(direction) {
+  public move(): void {
+    switch(this.movementDirection) {
       case Direction.RIGHT:
         if (this.xPos + this.movementSpeed < this.boundaries.rightBoundary) {
           this.xPos += this.movementSpeed;
@@ -47,8 +48,8 @@ export class Enemy extends GameObject {
    * Checks if the enemy reached a boundary with respect to its current movement direction
    * @param direction movement direction of the enemy
    */
-  public boundaryReached(direction: Direction): boolean {
-    switch(direction) {
+  public boundaryReached(): boolean {
+    switch(this.movementDirection) {
       case Direction.RIGHT:
         return this.xPos + this.movementSpeed >= this.boundaries.rightBoundary;
       case Direction.LEFT:
@@ -56,6 +57,14 @@ export class Enemy extends GameObject {
       case Direction.DOWN:
         return this.yPos + this.movementSpeed >= this.boundaries.lowerBoundary;
     }
+  }
+
+  getMovementDirection(): Direction {
+    return this.movementDirection;
+  }
+
+  setMovementDirection(direction: Direction): void {
+    this.movementDirection = direction;
   }
 
 }
