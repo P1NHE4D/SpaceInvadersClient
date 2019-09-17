@@ -1,7 +1,9 @@
 import {Direction, GameBoundaries, GameObject} from "./GameObject";
 
 export class Battleship extends GameObject {
-  private movementSpeed = 10;
+  private movementSpeed: number = 10;
+  private score: number = 0;
+  private lives: number = 3;
 
   /**
    * Instantiates a new battleship
@@ -38,6 +40,37 @@ export class Battleship extends GameObject {
         }
         break;
     }
+  }
+
+  getScore(): number {
+    return this.score;
+  }
+
+  addToScore(points: number) {
+    this.score += points;
+  }
+
+  subtractFromScore(points: number) {
+    if (this.score  - points >= 0) {
+      this.score -= points;
+    } else {
+      this.score = 0;
+    }
+
+  }
+
+  getLives(): number {
+    return this.lives;
+  }
+
+  removeLife(): void {
+    if (this.lives > 0) {
+      --this.lives;
+    }
+  }
+
+  addLife(): void {
+    ++this.lives;
   }
 
 }
