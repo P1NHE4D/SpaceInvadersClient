@@ -57,13 +57,14 @@ export class GameLogicService {
    * @param img image used to depict the enemy
    * @param yPos initial y-position of the row
    * @param boundaries game world boundaries
+   * @param hitScore rewarded score for hitting the enemy
    */
-  spawnEnemyRow(img: HTMLImageElement, yPos: number, boundaries: GameBoundaries): Enemy[] {
+  spawnEnemyRow(img: HTMLImageElement, yPos: number, boundaries: GameBoundaries, hitScore: number): Enemy[] {
     let enemies: Enemy[] = [];
     let enemiesPerRow = (boundaries.rightBoundary - 4 * img.width) / (img.width + 10);
     for (let i = 0; i < enemiesPerRow; ++i) {
       let xPos: number = (i * (img.width + 10));
-      let enemy: Enemy = new Enemy(img, xPos, yPos, boundaries, Direction.RIGHT);
+      let enemy: Enemy = new Enemy(img, xPos, yPos, boundaries, hitScore, Direction.RIGHT);
       enemies.push(enemy);
     }
     return enemies;

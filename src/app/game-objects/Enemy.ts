@@ -9,6 +9,7 @@ export class Enemy extends GameObject {
    * @param xPos initial x-position of enemy
    * @param yPos initial y-position of enemy
    * @param boundaries boundaries of the canvas
+   * @param hitScore score rewareded for hitting the enemy
    * @param movementDirection movement direction of the enemy
    */
   constructor(
@@ -16,6 +17,7 @@ export class Enemy extends GameObject {
     xPos: number,
     yPos: number,
     boundaries: GameBoundaries,
+    private hitScore: number,
     private movementDirection: Direction
   ) {
     super(image, xPos, yPos, boundaries);
@@ -66,4 +68,7 @@ export class Enemy extends GameObject {
     this.movementDirection = direction;
   }
 
+  getHitScore(): number {
+    return this.hitScore;
+  }
 }

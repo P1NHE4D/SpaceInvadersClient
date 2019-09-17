@@ -26,6 +26,8 @@ export class GameComponent implements OnInit {
   private gameOver: boolean = false;
   private cooldown: number = 40;
   private fireCooldown: number = 90;
+  private lives: number = 3;
+  private score: number = 0;
 
 
   constructor(
@@ -85,6 +87,7 @@ export class GameComponent implements OnInit {
       {name: 'Android', type: 'image', src: '/assets/gameObjects/AndroidAlien.png'},
       {name: 'Squid', type: 'image', src: '/assets/gameObjects/SquidAlien.png'},
       {name: 'Death', type: 'image', src: '/assets/gameObjects/DeathAlien.png'},
+      {name: 'TinyRedFighter', type: 'image', src: '/assets/gameObjects/TinyRedFighter.png'},
     ]);
   }
 
@@ -95,19 +98,24 @@ export class GameComponent implements OnInit {
     this.ctx.fillText("Press 'ENTER' to start the game", 100, 100);
     for (let j = 0; j < 4; ++j) {
       let img: HTMLImageElement;
+      let hitScore: number;
       switch(j % 3) {
         case 0:
           img = this.loadedImages.get('Android');
+          hitScore = 10;
           break;
         case 1:
           img = this.loadedImages.get('Squid');
+          hitScore = 20;
           break;
         case 2:
           img = this.loadedImages.get('Death');
+          hitScore = 30;
           break;
       }
-      this.enemies = this.enemies.concat(this.gameLogic.spawnEnemyRow(img, (j * (img.height + 10)), this.boundaries));
+      this.enemies = this.enemies.concat(this.gameLogic.spawnEnemyRow(img, (j * (img.height + 10)), this.boundaries, hitScore));
     }
+    // spawn player
     let playerImage = this.loadedImages.get('RedFighter');
     this.playerOne = this.gameLogic.spawnPlayer(
       playerImage,
@@ -118,26 +126,40 @@ export class GameComponent implements OnInit {
   }
 
   gameLoop = () => {
+    //TODO: spawn special enemies, e.g. ISS, UFO, nyan-nyan cat
+    //TODO: add background music
     if (this.gameOver) {
+      // TODO: Improve game over view
+      // TODO: submit score to server and switch to hight score view
       this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
       this.ctx.fillStyle = "#FFFFFF";
       this.ctx.font = "24pt Impact";
       this.ctx.fillText("GAME OVER", 100, 100);
       return;
     }
-    requestAnimationFrame(this.gameLoop);
-
-    this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     this.gameLogic.checkForBulletIntersections(this.friendlyBullets, this.enemies, (object, bullet) => {
-      let index = this.enemies.indexOf(object as Enemy);
+      let enemy: Enemy = object as Enemy;
+      let index = this.enemies.indexOf(enemy);
       this.enemies.splice(index, 1);
       index = this.friendlyBullets.indexOf(bullet);
       this.friendlyBullets.splice(index, 1);
+      if ((this.score % 1000) + enemy.getHitScore() >= 1000) {
+        this.lives += 1;
+      }
+      this.score += enemy.getHitScore();
+      if (this.enemies.length === 0) {
+        // TODO: Remove game over - stop game and respawn enemies after some time, increase level counter and difficulty
+        this.gameOver = true;
+      }
     });
     this.gameLogic.checkForBulletIntersection(this.enemyBullets, this.playerOne, (bullet) => {
       let index = this.enemyBullets.indexOf(bullet);
       this.enemyBullets.splice(index, 1);
-      this.gameOver = true;
+      if ((this.lives -= 1) === 0) {
+        this.gameOver = true;
+      }
+      //TODO: Add explosion sound and animation
+      //TODO: Stop game loop if enemy hit player and respawn player after pressing a button
     });
     this.gameLogic.moveBulletsUp(this.friendlyBullets, (bullet) => {
       let index = this.friendlyBullets.indexOf(bullet);
@@ -157,6 +179,21 @@ export class GameComponent implements OnInit {
       let randomEnemy = this.enemies[randomIndex];
       let bullet = this.gameLogic.fireBullet(randomEnemy, this.loadedImages.get('EnemyBullet'), this.boundaries);
       this.enemyBullets.push(bullet);
+    }
+    if (this.enemies.length === 0) {
+      this.gameOver = true;
+    }
+
+    requestAnimationFrame(this.gameLoop);
+    this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+    //TODO: Adjust position of hud
+    this.ctx.fillStyle = "#FFFFFF";
+    this.ctx.font = "12pt Impact";
+    this.ctx.fillText(`Score: ${this.score}`, 0, 300);
+    //TODO: Adjust display of lives if greater than 5
+    for (let i = 0; i < this.lives; ++i) {
+      let img: HTMLImageElement = this.loadedImages.get('TinyRedFighter');
+      this.ctx.drawImage(img, 10 + (i * (img.width + 5)), 350);
     }
     this.redrawObjects();
   };
