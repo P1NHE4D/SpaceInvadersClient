@@ -1,4 +1,4 @@
-export class GameObject {
+export abstract class GameObject {
   protected width: number;
   protected height: number;
   /**
@@ -8,7 +8,7 @@ export class GameObject {
    * @param yPos initial y-position of the game object
    * @param boundaries boundaries of the canvas
    * */
-  constructor(
+  protected constructor(
     private image: HTMLImageElement,
     protected xPos: number,
     protected yPos: number,

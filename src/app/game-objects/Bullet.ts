@@ -1,6 +1,7 @@
 import {Direction, GameBoundaries, GameObject} from "./GameObject";
 
 export class Bullet extends GameObject {
+  private readonly movementSpeed: number = 2;
 
   /**
    * Instantiates a new bullet
@@ -26,15 +27,15 @@ export class Bullet extends GameObject {
   move(direction: Direction, boundaryReached: () => any): void {
     switch(direction) {
       case Direction.UP:
-        if (this.yPos - 3 > this.boundaries.upperBoundary) {
-          this.yPos -= 3;
+        if (this.yPos - this.movementSpeed > this.boundaries.upperBoundary) {
+          this.yPos -= this.movementSpeed;
         } else {
           boundaryReached();
         }
         break;
       case Direction.DOWN:
-        if (this.yPos + 3 < this.boundaries.lowerBoundary) {
-          this.yPos += 3;
+        if (this.yPos + this.movementSpeed < this.boundaries.lowerBoundary) {
+          this.yPos += this.movementSpeed;
         } else {
           boundaryReached();
         }

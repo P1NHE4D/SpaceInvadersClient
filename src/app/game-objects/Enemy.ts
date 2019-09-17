@@ -27,7 +27,7 @@ export class Enemy extends GameObject {
   public move(): void {
     switch(this.movementDirection) {
       case Direction.RIGHT:
-        if (this.xPos + this.movementSpeed < this.boundaries.rightBoundary) {
+        if ((this.xPos + this.movementSpeed + this.width) < this.boundaries.rightBoundary) {
           this.xPos += this.movementSpeed;
         }
         break;
@@ -37,7 +37,7 @@ export class Enemy extends GameObject {
         }
         break;
       case Direction.DOWN:
-        if (this.yPos + this.movementSpeed < this.boundaries.lowerBoundary) {
+        if (this.yPos + this.movementSpeed + this.height < this.boundaries.lowerBoundary) {
           this.yPos += this.movementSpeed;
         }
         break;
@@ -46,12 +46,11 @@ export class Enemy extends GameObject {
 
   /**
    * Checks if the enemy reached a boundary with respect to its current movement direction
-   * @param direction movement direction of the enemy
    */
   public boundaryReached(): boolean {
     switch(this.movementDirection) {
       case Direction.RIGHT:
-        return this.xPos + this.movementSpeed >= this.boundaries.rightBoundary;
+        return (this.xPos + this.width + this.movementSpeed) >= this.boundaries.rightBoundary;
       case Direction.LEFT:
         return this.xPos - this.movementSpeed <= this.boundaries.leftBoundary;
       case Direction.DOWN:
