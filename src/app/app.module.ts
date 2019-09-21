@@ -7,6 +7,7 @@ import { MainMenuComponent } from './components/main-menu/main-menu.component';
 import { SingleplayerComponent } from './components/singleplayer/singleplayer.component';
 import { GameComponent } from './components/game/game.component';
 import { MultiplayerComponent } from './components/multiplayer/multiplayer.component';
+import { AircraftSelectionComponent } from './components/aircraft-selection/aircraft-selection.component';
 
 @NgModule({
   declarations: [
@@ -14,7 +15,8 @@ import { MultiplayerComponent } from './components/multiplayer/multiplayer.compo
     MainMenuComponent,
     SingleplayerComponent,
     GameComponent,
-    MultiplayerComponent
+    MultiplayerComponent,
+    AircraftSelectionComponent
   ],
   imports: [
     BrowserModule,

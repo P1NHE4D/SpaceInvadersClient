@@ -1,10 +1,11 @@
 import {Component, ElementRef, HostListener, Input, OnInit, ViewChild} from '@angular/core';
 import {Bullet} from "../../game-objects/Bullet";
 import {LoaderService} from "../../services/loader.service";
-import {GameBoundaries} from "../../game-objects/GameObject";
+import {GameObject} from "../../game-objects/GameObject";
 import {Battleship} from "../../game-objects/Battleship";
 import {Enemy} from "../../game-objects/Enemy";
 import {GameLogicService} from "../../services/game-logic.service";
+import {Explosion} from "../../game-objects/Explosion";
 
 @Component({
   selector: 'app-game',
@@ -13,9 +14,9 @@ import {GameLogicService} from "../../services/game-logic.service";
   providers: [GameLogicService]
 })
 export class GameComponent implements OnInit {
+  @Input() multiplayer: boolean = false;
   @ViewChild('canvas', { static: true })
   private canvas: ElementRef;
-  @Input() multiplayer: boolean = false;
 
   private ctx: CanvasRenderingContext2D;
   private loadedImages: Map<string, HTMLImageElement>;
@@ -25,7 +26,7 @@ export class GameComponent implements OnInit {
   private playerTwoBullets: Bullet[] = [];
   private enemies: Enemy[] = [];
   private enemyBullets: Bullet[] = [];
-  private boundaries: GameBoundaries;
+  private explosions: Explosion[] = [];
   private gameOver: boolean = false;
   private cooldown: number = 40;
   private fireCooldown: number = 90;
@@ -42,12 +43,6 @@ export class GameComponent implements OnInit {
     this.ctx = canvasEl.getContext('2d');
     this.ctx.canvas.width = 700;
     this.ctx.canvas.height = 400;
-    this.boundaries = {
-      leftBoundary: 0,
-      rightBoundary: this.ctx.canvas.width,
-      upperBoundary: 0,
-      lowerBoundary: this.ctx.canvas.height
-    };
     this.loader.resourcesLoaded$.subscribe( () => {
       this.loadedImages = this.loader.getImages();
       this.gameLoaded = true;
@@ -64,7 +59,7 @@ export class GameComponent implements OnInit {
       let bullet: Bullet;
       switch (event.key) {
         case("Shift"):
-          bullet = this.gameLogic.fireBullet(this.playerOne, this.loadedImages.get('PlayerOneBullet'), this.boundaries);
+          bullet = this.gameLogic.fireBullet(this.playerOne, this.loadedImages.get('PlayerOneBullet'), this.ctx);
           this.playerOneBullets.push(bullet);
           break;
         case("ArrowLeft"):
@@ -81,7 +76,7 @@ export class GameComponent implements OnInit {
       if (this.multiplayer) {
         switch(event.key) {
           case("Control"):
-            let bullet: Bullet = this.gameLogic.fireBullet(this.playerTwo, this.loadedImages.get('PlayerTwoBullet'), this.boundaries);
+            let bullet: Bullet = this.gameLogic.fireBullet(this.playerTwo, this.loadedImages.get('PlayerTwoBullet'), this.ctx);
             this.playerTwoBullets.push(bullet);
             break;
           case("a"):
@@ -113,6 +108,9 @@ export class GameComponent implements OnInit {
       {name: 'Death', type: 'image', src: '/assets/gameObjects/DeathAlien.png'},
       {name: 'TinyRedFighter', type: 'image', src: '/assets/gameObjects/TinyRedFighter.png'},
       {name: 'TinyBlueFighter', type: 'image', src: '/assets/gameObjects/TinyBlueFighter.png'},
+      {name: 'A318', type: 'image', src: '/assets/gameObjects/A318.png'},
+      {name: 'TinyA318', type: 'image', src: '/assets/gameObjects/TinyA318.png'},
+      {name: 'Explosion', type: 'image', src: '/assets/gameObjects/explosion.png'},
     ]);
   }
 
@@ -123,20 +121,20 @@ export class GameComponent implements OnInit {
     this.ctx.fillText("Press 'ENTER' to start the game", 100, 100);
     this.spawnEnemies();
     // spawn player
-    let playerImage = this.loadedImages.get('RedFighter');
+    let playerImage = this.loadedImages.get('A318');
     this.playerOne = this.gameLogic.spawnPlayer(
       playerImage,
-      (this.boundaries.rightBoundary / 2) - playerImage.width / 2,
-      this.boundaries.lowerBoundary,
-      this.boundaries
+      this.ctx,
+      (this.ctx.canvas.width / 2) - playerImage.width / 2,
+      this.ctx.canvas.height
     );
     if (this.multiplayer) {
       playerImage = this.loadedImages.get('BlueFighter');
       this.playerTwo = this.gameLogic.spawnPlayer(
         playerImage,
-        (this.boundaries.rightBoundary / 2) + playerImage.width,
-        this.boundaries.lowerBoundary,
-        this.boundaries
+        this.ctx,
+        (this.ctx.canvas.width / 2) + playerImage.width,
+        this.ctx.canvas.height
       );
     }
   }
@@ -158,6 +156,8 @@ export class GameComponent implements OnInit {
     this.gameLogic.checkForBulletIntersections(this.playerOneBullets, this.enemies, (object, bullet) => {
       let enemy: Enemy = object as Enemy;
       let index = this.enemies.indexOf(enemy);
+      let explosion = new Explosion(this.loadedImages.get("Explosion"), enemy.getX(), enemy.getY(), this.ctx, 32, 1);
+      this.explosions.push(explosion);
       this.enemies.splice(index, 1);
       index = this.playerOneBullets.indexOf(bullet);
       this.playerOneBullets.splice(index, 1);
@@ -228,7 +228,7 @@ export class GameComponent implements OnInit {
 
     // move enemies
     if ((this.cooldown -= 1) === 0) {
-      this.cooldown = 40;
+      this.cooldown = 20;
       this.gameLogic.moveEnemies(this.enemies);
     }
 
@@ -237,7 +237,7 @@ export class GameComponent implements OnInit {
       this.fireCooldown = 90;
       let randomIndex = Math.floor(Math.random() * this.enemies.length);
       let randomEnemy = this.enemies[randomIndex];
-      let bullet = this.gameLogic.fireBullet(randomEnemy, this.loadedImages.get('EnemyBullet'), this.boundaries);
+      let bullet = this.gameLogic.fireBullet(randomEnemy, this.loadedImages.get('EnemyBullet'), this.ctx);
       this.enemyBullets.push(bullet);
     }
 
@@ -253,7 +253,7 @@ export class GameComponent implements OnInit {
     }
     //TODO: Adjust display of lives if greater than 5
     for (let i = 0; i < this.playerOne.getLives(); ++i) {
-      let img: HTMLImageElement = this.loadedImages.get('TinyRedFighter');
+      let img: HTMLImageElement = this.loadedImages.get('TinyA318');
       this.ctx.drawImage(img, 10 + (i * (img.width + 5)), 350);
     }
     if (this.multiplayer) {
@@ -266,20 +266,28 @@ export class GameComponent implements OnInit {
   };
 
   redrawObjects(): void {
-    this.playerOne.draw(this.ctx);
+    this.playerOne.render();
+    for (let explosion of this.explosions) {
+      explosion.render();
+      explosion.update(() => {
+        let index = this.explosions.indexOf(explosion);
+        this.explosions.splice(index, 1);
+      });
+    }
     for (let enemy of this.enemies) {
-      enemy.draw(this.ctx);
+      enemy.render();
+      enemy.update();
     }
     for (let bullet of this.playerOneBullets) {
-      bullet.draw(this.ctx);
+      bullet.render();
     }
     for (let bullet of this.enemyBullets) {
-      bullet.draw(this.ctx);
+      bullet.render();
     }
     if (this.multiplayer) {
-      this.playerTwo.draw(this.ctx);
+      this.playerTwo.render();
       for (let bullet of this.playerTwoBullets) {
-        bullet.draw(this.ctx);
+        bullet.render();
       }
     }
   }
@@ -302,7 +310,7 @@ export class GameComponent implements OnInit {
           hitScore = 30;
           break;
       }
-      this.enemies = this.enemies.concat(this.gameLogic.spawnEnemyRow(img, (j * (img.height + 10)), this.boundaries, hitScore));
+      this.enemies = this.enemies.concat(this.gameLogic.spawnEnemyRow(img, this.ctx, (j * (img.height + 10)), hitScore, 2, 30));
     }
   }
 }

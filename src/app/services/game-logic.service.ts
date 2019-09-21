@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Direction, GameBoundaries, GameObject} from "../game-objects/GameObject";
+import {Direction, GameObject} from "../game-objects/GameObject";
 import {Battleship} from "../game-objects/Battleship";
 import {Bullet} from "../game-objects/Bullet";
 import {Enemy} from "../game-objects/Enemy";
@@ -14,15 +14,17 @@ export class GameLogicService {
    * @param img image that depicts the battleship
    * @param x initial x-position of the battleship
    * @param y initial y-position of the battleship
-   * @param boundaries
+   * @param ctx
    * @return returns a battleship instance
    */
-  spawnPlayer(img: HTMLImageElement, x: number, y:number, boundaries: GameBoundaries): Battleship {
+  spawnPlayer(img: HTMLImageElement, ctx: CanvasRenderingContext2D, x: number, y:number, frames?: number, ticksPerFrame?: number): Battleship {
     return new Battleship(
       img,
+      ctx,
       x,
       y,
-      boundaries
+      frames,
+      ticksPerFrame
     );
   }
 
@@ -48,8 +50,8 @@ export class GameLogicService {
    * @param img image used to depict the bullet
    * @param boundaries game world boundaries
    */
-  fireBullet(object: GameObject, img: HTMLImageElement, boundaries: GameBoundaries): Bullet {
-    return new Bullet(img, object.getX() + object.getWidth() / 2, object.getY(), boundaries);
+  fireBullet(object: GameObject, img: HTMLImageElement, ctx: CanvasRenderingContext2D): Bullet {
+    return new Bullet(img, ctx, object.getX() + object.getWidth() / 2, object.getY());
   }
 
   /**
@@ -59,12 +61,12 @@ export class GameLogicService {
    * @param boundaries game world boundaries
    * @param hitScore rewarded score for hitting the enemy
    */
-  spawnEnemyRow(img: HTMLImageElement, yPos: number, boundaries: GameBoundaries, hitScore: number): Enemy[] {
+  spawnEnemyRow(img: HTMLImageElement, ctx: CanvasRenderingContext2D, yPos: number, hitScore: number, frames?: number, ticksPerFrame?: number): Enemy[] {
     let enemies: Enemy[] = [];
-    let enemiesPerRow = (boundaries.rightBoundary - 4 * img.width) / (img.width + 10);
+    let enemiesPerRow = (ctx.canvas.width - 4 * img.width) / (img.width + 10);
     for (let i = 0; i < enemiesPerRow; ++i) {
       let xPos: number = (i * (img.width + 10));
-      let enemy: Enemy = new Enemy(img, xPos, yPos, boundaries, hitScore, Direction.RIGHT);
+      let enemy: Enemy = new Enemy(img, ctx, xPos, yPos, hitScore, Direction.RIGHT, frames, ticksPerFrame);
       enemies.push(enemy);
     }
     return enemies;

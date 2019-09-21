@@ -1,29 +1,50 @@
 export class GameObject {
   protected width: number;
   protected height: number;
+  protected frameIndex: number = 0;
+  protected tickCount: number = 0;
   /**
    * Instantiates a new game object
    * @param image image that depicts the game object
    * @param xPos initial x-position of the game object
    * @param yPos initial y-position of the game object
-   * @param boundaries boundaries of the canvas
+   * @param ctx canvas rendering context
+   * @param frames frames of the image
+   * @param ticksPerFrame refresh rate of the object
    * */
   constructor(
     private image: HTMLImageElement,
     protected xPos: number,
     protected yPos: number,
-    protected boundaries: GameBoundaries
+    protected ctx: CanvasRenderingContext2D,
+    protected frames: number = 1,
+    protected ticksPerFrame: number = 0
 
   ) {
-    this.width = image.width;
+    this.width = image.width / frames;
     this.height = image.height;
   }
 
-  /**
-   * Draws the game object on the canvas according to its current x- and y-values
-   */
-  draw(ctx: CanvasRenderingContext2D): void {
-    ctx.drawImage(this.image, this.xPos, this.yPos);
+  render(): void {
+    this.ctx.drawImage(
+      this.image,
+      this.frameIndex * this.width,
+      0,
+      this.width,
+      this.height,
+      this.xPos,
+      this.yPos,
+      this.width,
+      this.height
+    )
+  }
+
+  update(): void {
+    this.tickCount += 1;
+    if (this.tickCount > this.ticksPerFrame) {
+      this.tickCount = 0;
+      this.frameIndex = (this.frameIndex + 1) % this.frames;
+    }
   }
 
   /**
@@ -54,13 +75,6 @@ export class GameObject {
     return this.height;
   }
 
-}
-
-export interface GameBoundaries {
-  leftBoundary: number;
-  rightBoundary: number;
-  upperBoundary: number;
-  lowerBoundary: number;
 }
 
 /**

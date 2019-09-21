@@ -8,15 +8,19 @@ export class Bullet extends GameObject {
    * @param image image that depicts the bullet
    * @param xPos initial x-position of the bullet
    * @param yPos initial y-position of the bullet
-   * @param boundaries boundaries of the canvas
+   * @param ctx canvas rendering context
+   * @param frames number of frames per image
+   * @param ticksPerFrame ticks between switching from one frame to the next
    */
   constructor(
     image: HTMLImageElement,
+    ctx: CanvasRenderingContext2D,
     xPos: number,
     yPos: number,
-    boundaries: GameBoundaries,
+    frames?: number,
+    ticksPerFrame?: number
   ) {
-    super(image, xPos, yPos, boundaries);
+    super(image, xPos, yPos, ctx, frames, ticksPerFrame);
   }
 
   /**
@@ -27,14 +31,14 @@ export class Bullet extends GameObject {
   move(direction: Direction, boundaryReached: () => any): void {
     switch(direction) {
       case Direction.UP:
-        if (this.yPos - this.movementSpeed > this.boundaries.upperBoundary) {
+        if (this.yPos - this.movementSpeed > 0) {
           this.yPos -= this.movementSpeed;
         } else {
           boundaryReached();
         }
         break;
       case Direction.DOWN:
-        if (this.yPos + this.movementSpeed < this.boundaries.lowerBoundary) {
+        if (this.yPos + this.movementSpeed < this.ctx.canvas.height) {
           this.yPos += this.movementSpeed;
         } else {
           boundaryReached();

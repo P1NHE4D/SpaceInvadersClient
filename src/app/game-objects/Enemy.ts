@@ -1,46 +1,50 @@
-import {Direction, GameBoundaries, GameObject} from "./GameObject";
+import {Direction, GameObject} from "./GameObject";
 
 export class Enemy extends GameObject {
-  private readonly movementSpeed: number = 6;
+  private readonly movementDistance: number = 6;
 
   /**
    * Instantiates a new enemy
    * @param image image that depicts the enemy
    * @param xPos initial x-position of enemy
    * @param yPos initial y-position of enemy
-   * @param boundaries boundaries of the canvas
-   * @param hitScore score rewareded for hitting the enemy
+   * @param ctx canvas rendering context
+   * @param hitScore score rewarded for hitting the enemy
    * @param movementDirection movement direction of the enemy
+   * @param frames number of frames per image
+   * @param ticksPerFrame ticks between switching from one frame to the next
    */
   constructor(
     image: HTMLImageElement,
+    ctx: CanvasRenderingContext2D,
     xPos: number,
     yPos: number,
-    boundaries: GameBoundaries,
-    private hitScore: number,
-    private movementDirection: Direction
+    private hitScore: number = 10,
+    private movementDirection: Direction = Direction.RIGHT,
+    frames?: number,
+    ticksPerFrame?: number
   ) {
-    super(image, xPos, yPos, boundaries);
+    super(image, xPos, yPos, ctx, frames, ticksPerFrame);
   }
 
   /**
    * Moves the enemy in the desired direction by a predefined value
    */
-  public move(): void {
+   move(): void {
     switch(this.movementDirection) {
       case Direction.RIGHT:
-        if ((this.xPos + this.movementSpeed + this.width) < this.boundaries.rightBoundary) {
-          this.xPos += this.movementSpeed;
+        if ((this.xPos + this.movementDistance + this.width) < this.ctx.canvas.width) {
+          this.xPos += this.movementDistance;
         }
         break;
       case Direction.LEFT:
-        if (this.xPos - this.movementSpeed > this.boundaries.leftBoundary) {
-          this.xPos -= this.movementSpeed;
+        if (this.xPos - this.movementDistance > 0) {
+          this.xPos -= this.movementDistance;
         }
         break;
       case Direction.DOWN:
-        if (this.yPos + this.movementSpeed + this.height < this.boundaries.lowerBoundary) {
-          this.yPos += this.movementSpeed;
+        if (this.yPos + this.movementDistance + this.height < this.ctx.canvas.height) {
+          this.yPos += this.movementDistance;
         }
         break;
     }
@@ -49,14 +53,14 @@ export class Enemy extends GameObject {
   /**
    * Checks if the enemy reached a boundary with respect to its current movement direction
    */
-  public boundaryReached(): boolean {
+   boundaryReached(): boolean {
     switch(this.movementDirection) {
       case Direction.RIGHT:
-        return (this.xPos + this.width + this.movementSpeed) >= this.boundaries.rightBoundary;
+        return (this.xPos + this.width + this.movementDistance) >= this.ctx.canvas.width;
       case Direction.LEFT:
-        return this.xPos - this.movementSpeed <= this.boundaries.leftBoundary;
+        return this.xPos - this.movementDistance <= 0;
       case Direction.DOWN:
-        return this.yPos + this.movementSpeed >= this.boundaries.lowerBoundary;
+        return this.yPos + this.movementDistance >= this.ctx.canvas.height;
     }
   }
 
