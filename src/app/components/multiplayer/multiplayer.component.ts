@@ -8,12 +8,8 @@ import {Location} from "@angular/common";
 })
 export class MultiplayerComponent implements OnInit {
 
-  constructor(private location: Location) { }
+  constructor() { }
 
   ngOnInit() {
-  }
-
-  goBack() {
-    this.location.back();
   }
 }

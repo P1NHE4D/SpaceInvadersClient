@@ -13,6 +13,10 @@ export class Explosion extends GameObject {
     super(image, xPos, yPos, ctx, frames, ticksPerFrame)
   }
 
+  /**
+   * Updates the frame of the explosion
+   * @param animationFinished callback function executed as soon as animation is finished
+   */
   update(animationFinished?: () => any): void {
     if(animationFinished !== null && this.frameIndex === this.frames - 1) {
       animationFinished();

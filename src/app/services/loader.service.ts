@@ -20,11 +20,8 @@ export class LoaderService {
 
   resourcesLoaded$ = this.resourcesLoadedSource.asObservable();
 
-  /**
-   * @return a map containing all loaded images
-   */
-  getImages(): Map<string, HTMLImageElement> {
-    return this.loadedImages;
+  getImage(name: string): HTMLImageElement {
+    return this.loadedImages.get(name);
   }
 
   /**

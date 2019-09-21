@@ -1,4 +1,4 @@
-import {Direction, GameBoundaries, GameObject} from "./GameObject";
+import {Direction, GameObject} from "./GameObject";
 
 export class Battleship extends GameObject {
   private movementSpeed: number = 10;

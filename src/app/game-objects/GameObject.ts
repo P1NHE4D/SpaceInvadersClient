@@ -1,4 +1,4 @@
-export class GameObject {
+export abstract class GameObject {
   protected width: number;
   protected height: number;
   protected frameIndex: number = 0;
@@ -12,7 +12,7 @@ export class GameObject {
    * @param frames frames of the image
    * @param ticksPerFrame refresh rate of the object
    * */
-  constructor(
+  protected constructor(
     private image: HTMLImageElement,
     protected xPos: number,
     protected yPos: number,
@@ -25,6 +25,9 @@ export class GameObject {
     this.height = image.height;
   }
 
+  /**
+   * Draws the game object on the canvas
+   */
   render(): void {
     this.ctx.drawImage(
       this.image,
@@ -39,6 +42,9 @@ export class GameObject {
     )
   }
 
+  /**
+   * Updates the frame of the game object
+   */
   update(): void {
     this.tickCount += 1;
     if (this.tickCount > this.ticksPerFrame) {

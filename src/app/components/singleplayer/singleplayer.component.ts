@@ -8,13 +8,9 @@ import {Location} from "@angular/common";
 })
 export class SingleplayerComponent implements OnInit {
 
-  constructor(private location: Location) { }
+  constructor() { }
 
   ngOnInit() {
-  }
-
-  goBack() {
-    this.location.back();
   }
 
 }

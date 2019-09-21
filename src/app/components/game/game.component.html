@@ -1,1 +1,32 @@
 <canvas #canvas ></canvas>
+<div class="score-bar">
+  <div class="flex-container-left left">
+    <p class="red" *ngIf="playerOne">P1 Score: {{playerOne.getScore()}}</p>
+    <p class="red" *ngIf="playerOne">P1 Lives: {{playerOne.getLives()}}</p>
+  </div>
+  <div class="flex-container-left right">
+    <p class="blue" *ngIf="playerTwo">P2 Score: {{playerTwo.getScore()}}</p>
+    <p class="blue" *ngIf="playerTwo">P2 Lives: {{playerTwo.getLives()}}</p>
+  </div>
+</div>
+
+<div class="modal" [ngStyle]="{'display': displayStartModal}">
+    <div class="flex-container-center">
+        <button class="btn btn-main-lg" *ngIf="!gameLoaded" disabled><i class="fa fa-spinner fa-pulse"></i> Loading...</button>
+        <button class="btn btn-main-lg" *ngIf="gameLoaded" (click)="hideStartModal(); gameLoop();">Start</button>
+        <button class="btn btn-main-lg" routerLink="/">Main Menu</button>
+    </div>
+</div>
+
+<div class="modal" [ngStyle]="{'display': displayGameOverModal}">
+    <div class="flex-container-center">
+      <h2 class="main-title">Game Over</h2>
+      <h3 *ngIf="playerOne" class="red mt-20">Player 1 Score: {{playerOne.getScore()}}</h3>
+      <h3 *ngIf="playerTwo" class="blue mb-20">Player 2 Score: {{playerTwo.getScore()}}</h3>
+      <input *ngIf="playerOne" class="custom-input mt-20" placeholder="Player 1 Name">
+      <input *ngIf="playerTwo" class="custom-input mt-20 mb-20" placeholder="Player 2 Name">
+      <!-- TODO: Submit scores to server -->
+      <button class="btn btn-main-md mt-20" routerLink="/highscores">Submit</button>
+    </div>
+</div>
+

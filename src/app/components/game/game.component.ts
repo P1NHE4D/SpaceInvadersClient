@@ -1,11 +1,11 @@
 import {Component, ElementRef, HostListener, Input, OnInit, ViewChild} from '@angular/core';
 import {Bullet} from "../../game-objects/Bullet";
 import {LoaderService} from "../../services/loader.service";
-import {GameObject} from "../../game-objects/GameObject";
 import {Battleship} from "../../game-objects/Battleship";
 import {Enemy} from "../../game-objects/Enemy";
 import {GameLogicService} from "../../services/game-logic.service";
 import {Explosion} from "../../game-objects/Explosion";
+import {Location} from "@angular/common";
 
 @Component({
   selector: 'app-game',
@@ -17,9 +17,10 @@ export class GameComponent implements OnInit {
   @Input() multiplayer: boolean = false;
   @ViewChild('canvas', { static: true })
   private canvas: ElementRef;
+  private displayStartModal: string = 'block';
+  private displayGameOverModal: string = 'none';
 
   private ctx: CanvasRenderingContext2D;
-  private loadedImages: Map<string, HTMLImageElement>;
   private playerOne: Battleship;
   private playerOneBullets: Bullet[] = [];
   private playerTwo: Battleship;
@@ -34,6 +35,7 @@ export class GameComponent implements OnInit {
 
 
   constructor(
+    private location: Location,
     private loader: LoaderService,
     private gameLogic: GameLogicService
   ) {}
@@ -44,7 +46,6 @@ export class GameComponent implements OnInit {
     this.ctx.canvas.width = 700;
     this.ctx.canvas.height = 400;
     this.loader.resourcesLoaded$.subscribe( () => {
-      this.loadedImages = this.loader.getImages();
       this.gameLoaded = true;
       this.setupGame();
     });
@@ -58,8 +59,8 @@ export class GameComponent implements OnInit {
     if (this.gameLoaded) {
       let bullet: Bullet;
       switch (event.key) {
-        case("Shift"):
-          bullet = this.gameLogic.fireBullet(this.playerOne, this.loadedImages.get('PlayerOneBullet'), this.ctx);
+        case("ArrowUp"):
+          bullet = this.gameLogic.fireBullet(this.playerOne, this.loader.getImage('PlayerOneBullet'), this.ctx);
           this.playerOneBullets.push(bullet);
           break;
         case("ArrowLeft"):
@@ -68,15 +69,11 @@ export class GameComponent implements OnInit {
         case("ArrowRight"):
           this.gameLogic.movePlayerRight(this.playerOne);
           break;
-        case("Enter"):
-          // TODO: game loop started multiple times if enter pressed more than once
-          this.gameLoop();
-          break;
       }
       if (this.multiplayer) {
         switch(event.key) {
-          case("Control"):
-            let bullet: Bullet = this.gameLogic.fireBullet(this.playerTwo, this.loadedImages.get('PlayerTwoBullet'), this.ctx);
+          case("w"):
+            let bullet: Bullet = this.gameLogic.fireBullet(this.playerTwo, this.loader.getImage('PlayerTwoBullet'), this.ctx);
             this.playerTwoBullets.push(bullet);
             break;
           case("a"):
@@ -116,12 +113,9 @@ export class GameComponent implements OnInit {
 
   setupGame(): void {
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-    this.ctx.fillStyle = "#FF0000";
-    this.ctx.font = "24pt Impact";
-    this.ctx.fillText("Press 'ENTER' to start the game", 100, 100);
     this.spawnEnemies();
     // spawn player
-    let playerImage = this.loadedImages.get('A318');
+    let playerImage = this.loader.getImage('A318');
     this.playerOne = this.gameLogic.spawnPlayer(
       playerImage,
       this.ctx,
@@ -129,7 +123,7 @@ export class GameComponent implements OnInit {
       this.ctx.canvas.height
     );
     if (this.multiplayer) {
-      playerImage = this.loadedImages.get('BlueFighter');
+      playerImage = this.loader.getImage('BlueFighter');
       this.playerTwo = this.gameLogic.spawnPlayer(
         playerImage,
         this.ctx,
@@ -144,20 +138,21 @@ export class GameComponent implements OnInit {
     //TODO: add background music
     if (this.gameOver) {
       // TODO: Improve game over view
-      // TODO: submit score to server and switch to hight score view
+      // TODO: Show pop up to enter name of the player(s)
+      // TODO: submit score to server and switch to high score view
       this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-      this.ctx.fillStyle = "#FFFFFF";
-      this.ctx.font = "24pt Impact";
-      this.ctx.fillText("GAME OVER", 100, 100);
+      this.displayGameOverModal = 'block';
       return;
     }
 
     //Check for player bullet intersections
+    // TODO: Extract method
     this.gameLogic.checkForBulletIntersections(this.playerOneBullets, this.enemies, (object, bullet) => {
       let enemy: Enemy = object as Enemy;
       let index = this.enemies.indexOf(enemy);
-      let explosion = new Explosion(this.loadedImages.get("Explosion"), enemy.getX(), enemy.getY(), this.ctx, 32, 1);
+      let explosion = new Explosion(this.loader.getImage("Explosion"), enemy.getX(), enemy.getY(), this.ctx, 32, 1);
       this.explosions.push(explosion);
+      // TODO: Add explosion sound
       this.enemies.splice(index, 1);
       index = this.playerOneBullets.indexOf(bullet);
       this.playerOneBullets.splice(index, 1);
@@ -170,6 +165,8 @@ export class GameComponent implements OnInit {
       this.gameLogic.checkForBulletIntersections(this.playerTwoBullets, this.enemies, (object, bullet) => {
         let enemy: Enemy = object as Enemy;
         let index = this.enemies.indexOf(enemy);
+        let explosion = new Explosion(this.loader.getImage("Explosion"), enemy.getX(), enemy.getY(), this.ctx, 32, 1);
+        this.explosions.push(explosion);
         this.enemies.splice(index, 1);
         index = this.playerTwoBullets.indexOf(bullet);
         this.playerTwoBullets.splice(index, 1);
@@ -237,31 +234,13 @@ export class GameComponent implements OnInit {
       this.fireCooldown = 90;
       let randomIndex = Math.floor(Math.random() * this.enemies.length);
       let randomEnemy = this.enemies[randomIndex];
-      let bullet = this.gameLogic.fireBullet(randomEnemy, this.loadedImages.get('EnemyBullet'), this.ctx);
+      let bullet = this.gameLogic.fireBullet(randomEnemy, this.loader.getImage('EnemyBullet'), this.ctx);
       this.enemyBullets.push(bullet);
     }
 
     // redraw all objects
     requestAnimationFrame(this.gameLoop);
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-    //TODO: Adjust position of hud
-    this.ctx.fillStyle = "#FFFFFF";
-    this.ctx.font = "12pt Impact";
-    this.ctx.fillText(`P1 Score: ${this.playerOne.getScore()}`, 0, 300);
-    if (this.multiplayer) {
-      this.ctx.fillText(`P2 Score: ${this.playerTwo.getScore()}`, 0, 320);
-    }
-    //TODO: Adjust display of lives if greater than 5
-    for (let i = 0; i < this.playerOne.getLives(); ++i) {
-      let img: HTMLImageElement = this.loadedImages.get('TinyA318');
-      this.ctx.drawImage(img, 10 + (i * (img.width + 5)), 350);
-    }
-    if (this.multiplayer) {
-      for (let i = 0; i < this.playerTwo.getLives(); ++i) {
-        let img: HTMLImageElement = this.loadedImages.get('TinyBlueFighter');
-        this.ctx.drawImage(img, 10 + (i * (img.width + 5)), 370);
-      }
-    }
     this.redrawObjects();
   };
 
@@ -298,19 +277,23 @@ export class GameComponent implements OnInit {
       let hitScore: number;
       switch(j % 3) {
         case 0:
-          img = this.loadedImages.get('Android');
+          img = this.loader.getImage('Android');
           hitScore = 10;
           break;
         case 1:
-          img = this.loadedImages.get('Squid');
+          img = this.loader.getImage('Squid');
           hitScore = 20;
           break;
         case 2:
-          img = this.loadedImages.get('Death');
+          img = this.loader.getImage('Death');
           hitScore = 30;
           break;
       }
       this.enemies = this.enemies.concat(this.gameLogic.spawnEnemyRow(img, this.ctx, (j * (img.height + 10)), hitScore, 2, 30));
     }
+  }
+
+  hideStartModal(): void {
+    this.displayStartModal = 'none';
   }
 }

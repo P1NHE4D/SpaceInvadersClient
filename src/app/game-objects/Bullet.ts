@@ -1,4 +1,4 @@
-import {Direction, GameBoundaries, GameObject} from "./GameObject";
+import {Direction, GameObject} from "./GameObject";
 
 export class Bullet extends GameObject {
   private readonly movementSpeed: number = 2;

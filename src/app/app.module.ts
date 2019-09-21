@@ -8,6 +8,9 @@ import { SingleplayerComponent } from './components/singleplayer/singleplayer.co
 import { GameComponent } from './components/game/game.component';
 import { MultiplayerComponent } from './components/multiplayer/multiplayer.component';
 import { AircraftSelectionComponent } from './components/aircraft-selection/aircraft-selection.component';
+import { HighscoreComponent } from './components/highscore/highscore.component';
+import {FormsModule} from "@angular/forms";
+import {AngularFontAwesomeModule} from "angular-font-awesome";
 
 @NgModule({
   declarations: [
@@ -16,11 +19,14 @@ import { AircraftSelectionComponent } from './components/aircraft-selection/airc
     SingleplayerComponent,
     GameComponent,
     MultiplayerComponent,
-    AircraftSelectionComponent
+    AircraftSelectionComponent,
+    HighscoreComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
+    FormsModule,
+    AngularFontAwesomeModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
