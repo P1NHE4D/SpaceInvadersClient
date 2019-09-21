@@ -43,8 +43,8 @@ export class Enemy extends GameObject {
         }
         break;
       case Direction.DOWN:
-        if (this.yPos + this.movementDistance + this.height < this.ctx.canvas.height) {
-          this.yPos += this.movementDistance;
+        if (this.yPos + 10 + this.height < this.ctx.canvas.height) {
+          this.yPos += 10;
         }
         break;
     }

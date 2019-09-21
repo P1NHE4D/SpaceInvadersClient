@@ -1,3 +1,4 @@
+<h3 *ngIf="shipsSelected" class="flex-container-center">Level: {{level}}</h3>
 <canvas #canvas ></canvas>
 <div class="score-bar">
   <div class="flex-container-left left">
@@ -12,9 +13,31 @@
 
 <div class="modal" [ngStyle]="{'display': displayStartModal}">
     <div class="flex-container-center">
-        <button class="btn btn-main-lg" *ngIf="!gameLoaded" disabled><i class="fa fa-spinner fa-pulse"></i> Loading...</button>
-        <button class="btn btn-main-lg" *ngIf="gameLoaded" (click)="hideStartModal(); gameLoop();">Start</button>
-        <button class="btn btn-main-lg" routerLink="/">Main Menu</button>
+      <h2 class="main-title mb-20" *ngIf="shipsSelected">Ready?</h2>
+      <p class="mb-10" *ngIf="!shipsSelected">Player 1: Select a Battleship</p>
+      <div *ngIf="gameLoaded && !shipsSelected" class="row mb-20">
+        <div class="preview-tile" *ngFor="let image of availableBattleships" (click)="selectPlayerOneShip(image)" [class.active]="image === playerOneSelectedBattleship">
+          <div class="flex-container-center">
+            <img src="{{image.src}}"/>
+          </div>
+        </div>
+
+      </div>
+      <p class="mb-10" *ngIf="multiplayer && !shipsSelected">Player 2: Select a Battleship</p>
+      <div *ngIf="gameLoaded && multiplayer && !shipsSelected" class="row mb-20">
+        <div class="preview-tile" *ngFor="let image of availableBattleships" (click)="selectPlayerTwoShip(image)" [class.active]="image === playerTwoSelectedBattleship">
+          <div class="flex-container-center">
+            <img src="{{image.src}}"/>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <button class="btn-main-md" routerLink="/"><i class="fa fa-times"></i> Abort Mission</button>
+        <button class="btn-main-md" *ngIf="!gameLoaded" disabled><i class="fa fa-spinner fa-pulse"></i> Loading...</button>
+        <button class="btn-main-md" *ngIf="gameLoaded && !shipsSelected" (click)="setupGame(); confirmSelection();"><i class="fa fa-check"></i> Confirm</button>
+        <button class="btn-main-md" *ngIf="gameLoaded && shipsSelected" (click)="hideStartModal(); gameLoop();"><i class="fa fa-rocket"></i> Launch</button>
+      </div>
+
     </div>
 </div>
 

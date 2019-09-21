@@ -43,3 +43,24 @@ p {
   padding: 0;
   margin: 0;
 }
+
+.preview-tile {
+  background-color: rgba(255, 0, 0, 0.5);
+  color: #ffffff;
+  border: solid rgba(255, 0, 0, 0);
+  padding: 10px;
+  margin: 5px;
+  text-align: center;
+  width: 80px;
+  height: 80px;
+}
+
+.preview-tile.active {
+  background-color: rgba(41, 41, 41, 0.8);
+  color: #ffffff;
+  border: solid rgba(41, 41, 41, 0);
+}
+
+.preview-tile:hover {
+  cursor: pointer;
+}

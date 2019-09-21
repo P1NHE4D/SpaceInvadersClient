@@ -21,6 +21,11 @@ export class GameComponent implements OnInit {
   private displayGameOverModal: string = 'none';
 
   private ctx: CanvasRenderingContext2D;
+  private availableBattleships: HTMLImageElement[] = [];
+  private playerOneSelectedBattleship: HTMLImageElement;
+  private playerTwoSelectedBattleship: HTMLImageElement;
+  private shipsSelected: boolean = false;
+
   private playerOne: Battleship;
   private playerOneBullets: Bullet[] = [];
   private playerTwo: Battleship;
@@ -29,9 +34,14 @@ export class GameComponent implements OnInit {
   private enemyBullets: Bullet[] = [];
   private explosions: Explosion[] = [];
   private gameOver: boolean = false;
-  private cooldown: number = 40;
-  private fireCooldown: number = 90;
+  private numbOfEnemyRows: number = 4;
+  // TODO: Replace cooldown and fireCooldown
+  private ticksBetweenMoves: number = 20;
+  private movementTicksCount: number = 0;
+  private ticksBetweenShots: number = 90;
+  private shotTicksCount: number = 0;
   private gameLoaded: boolean = false;
+  private level: number = 1;
 
 
   constructor(
@@ -46,8 +56,14 @@ export class GameComponent implements OnInit {
     this.ctx.canvas.width = 700;
     this.ctx.canvas.height = 400;
     this.loader.resourcesLoaded$.subscribe( () => {
+      this.availableBattleships.push(
+        this.loader.getImage('RedFighter'),
+        this.loader.getImage('BlueFighter'),
+        this.loader.getImage('A318')
+      );
+      this.playerOneSelectedBattleship = this.loader.getImage('RedFighter');
+      this.playerTwoSelectedBattleship = this.loader.getImage('RedFighter');
       this.gameLoaded = true;
-      this.setupGame();
     });
     this.loadFiles();
   }
@@ -91,31 +107,24 @@ export class GameComponent implements OnInit {
    * Load game assets
    */
   loadFiles(): void {
-    this.ctx.fillStyle = "#FFFFFF";
-    this.ctx.font = "24pt Impact";
-    this.ctx.fillText("Loading...", 200, 200);
     this.loader.preload([
       {name: 'RedFighter', type: 'image', src: '/assets/gameObjects/RedFighter.png'},
       {name: 'BlueFighter', type: 'image', src: '/assets/gameObjects/BlueFighter.png'},
+      {name: 'A318', type: 'image', src: '/assets/gameObjects/A318.png'},
       {name: 'PlayerOneBullet', type: 'image', src: '/assets/gameObjects/PlayerOneBullet.png'},
       {name: 'PlayerTwoBullet', type: 'image', src: '/assets/gameObjects/PlayerTwoBullet.png'},
       {name: 'EnemyBullet', type: 'image', src: '/assets/gameObjects/EnemyBullet.png'},
       {name: 'Android', type: 'image', src: '/assets/gameObjects/AndroidAlien.png'},
       {name: 'Squid', type: 'image', src: '/assets/gameObjects/SquidAlien.png'},
       {name: 'Death', type: 'image', src: '/assets/gameObjects/DeathAlien.png'},
-      {name: 'TinyRedFighter', type: 'image', src: '/assets/gameObjects/TinyRedFighter.png'},
-      {name: 'TinyBlueFighter', type: 'image', src: '/assets/gameObjects/TinyBlueFighter.png'},
-      {name: 'A318', type: 'image', src: '/assets/gameObjects/A318.png'},
-      {name: 'TinyA318', type: 'image', src: '/assets/gameObjects/TinyA318.png'},
-      {name: 'Explosion', type: 'image', src: '/assets/gameObjects/explosion.png'},
+      {name: 'Explosion', type: 'image', src: '/assets/gameObjects/Explosion.png'},
+      {name: 'BigExplosion', type: 'image', src: '/assets/gameObjects/BigExplosion.png'},
     ]);
   }
 
   setupGame(): void {
-    this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     this.spawnEnemies();
-    // spawn player
-    let playerImage = this.loader.getImage('A318');
+    let playerImage = this.playerOneSelectedBattleship;
     this.playerOne = this.gameLogic.spawnPlayer(
       playerImage,
       this.ctx,
@@ -123,7 +132,7 @@ export class GameComponent implements OnInit {
       this.ctx.canvas.height
     );
     if (this.multiplayer) {
-      playerImage = this.loader.getImage('BlueFighter');
+      playerImage = this.playerTwoSelectedBattleship;
       this.playerTwo = this.gameLogic.spawnPlayer(
         playerImage,
         this.ctx,
@@ -137,8 +146,6 @@ export class GameComponent implements OnInit {
     //TODO: spawn special enemies, e.g. ISS, UFO, nyan-nyan cat
     //TODO: add background music
     if (this.gameOver) {
-      // TODO: Improve game over view
-      // TODO: Show pop up to enter name of the player(s)
       // TODO: submit score to server and switch to high score view
       this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
       this.displayGameOverModal = 'block';
@@ -181,6 +188,24 @@ export class GameComponent implements OnInit {
     this.gameLogic.checkForBulletIntersection(this.enemyBullets, this.playerOne, (bullet) => {
       let index = this.enemyBullets.indexOf(bullet);
       this.enemyBullets.splice(index, 1);
+      let image = this.loader.getImage("BigExplosion");
+      let x = this.playerOne.getX();
+      let y = this.playerOne.getY();
+      /*
+      if (x + image.width > this.ctx.canvas.width) {
+        x -= (x + image.width - this.ctx.canvas.width);
+      }
+      if (y + image.height > this.ctx.canvas.height) {
+        y = y - 20;
+      }*/
+      let explosion = new Explosion(
+        image,
+        x,
+        y,
+        this.ctx,
+        32,
+        1);
+      this.explosions.push(explosion);
       this.playerOne.removeLife();
       if (this.playerOne.getLives() === 0) {
         this.gameOver = true;
@@ -198,12 +223,22 @@ export class GameComponent implements OnInit {
         }
         //TODO: Add explosion sound and animation
         //TODO: Stop game loop if enemy hit player and respawn player after pressing a button
+        //TODO: Game over if enemies reached the lower boundary of the game
       });
     }
 
-    // Check if there are still some enemies alive
+    // Respawn enemies and increase difficulty
     if (this.enemies.length === 0) {
-      // TODO: increase level counter and difficulty
+      ++this.level;
+      if (this.numbOfEnemyRows <= 7 && this.level % 2 === 0) {
+        ++this.numbOfEnemyRows;
+      }
+      if (this.ticksBetweenShots >= 60 && this.level % 3 === 0) {
+        this.ticksBetweenShots -= 10;
+      }
+      if (this.ticksBetweenMoves >= 10 && this.level % 5 === 0) {
+        this.ticksBetweenMoves -= 5;
+      }
       this.spawnEnemies();
     }
 
@@ -224,14 +259,14 @@ export class GameComponent implements OnInit {
     });
 
     // move enemies
-    if ((this.cooldown -= 1) === 0) {
-      this.cooldown = 20;
+    if ((++this.movementTicksCount) === this.ticksBetweenMoves) {
+      this.movementTicksCount = 0;
       this.gameLogic.moveEnemies(this.enemies);
     }
 
     // initiate enemy fire
-    if ((this.fireCooldown -= 1) === 0) {
-      this.fireCooldown = 90;
+    if ((++this.shotTicksCount) === this.ticksBetweenShots) {
+      this.shotTicksCount = 0;
       let randomIndex = Math.floor(Math.random() * this.enemies.length);
       let randomEnemy = this.enemies[randomIndex];
       let bullet = this.gameLogic.fireBullet(randomEnemy, this.loader.getImage('EnemyBullet'), this.ctx);
@@ -272,7 +307,7 @@ export class GameComponent implements OnInit {
   }
 
   spawnEnemies(): void {
-    for (let j = 0; j < 4; ++j) {
+    for (let j = 0; j < this.numbOfEnemyRows; ++j) {
       let img: HTMLImageElement;
       let hitScore: number;
       switch(j % 3) {
@@ -295,5 +330,17 @@ export class GameComponent implements OnInit {
 
   hideStartModal(): void {
     this.displayStartModal = 'none';
+  }
+
+  selectPlayerOneShip(image: HTMLImageElement): void {
+    this.playerOneSelectedBattleship = image;
+  }
+
+  selectPlayerTwoShip(image: HTMLImageElement): void {
+    this.playerTwoSelectedBattleship = image;
+  }
+
+  confirmSelection(): void {
+    this.shipsSelected = true;
   }
 }

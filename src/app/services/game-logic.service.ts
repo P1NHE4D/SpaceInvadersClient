@@ -58,12 +58,15 @@ export class GameLogicService {
    * Spawns a single row of enemies filling the entire screen
    * @param img image used to depict the enemy
    * @param yPos initial y-position of the row
-   * @param boundaries game world boundaries
+   * @param ctx canvas rendering context
    * @param hitScore rewarded score for hitting the enemy
+   * @param frames number of image frames
+   * @param ticksPerFrame ticks in between two frames
+   *
    */
   spawnEnemyRow(img: HTMLImageElement, ctx: CanvasRenderingContext2D, yPos: number, hitScore: number, frames?: number, ticksPerFrame?: number): Enemy[] {
     let enemies: Enemy[] = [];
-    let enemiesPerRow = (ctx.canvas.width - 4 * img.width) / (img.width + 10);
+    let enemiesPerRow = (ctx.canvas.width - 2 * img.width) / (img.width + 10);
     for (let i = 0; i < enemiesPerRow; ++i) {
       let xPos: number = (i * (img.width + 10));
       let enemy: Enemy = new Enemy(img, ctx, xPos, yPos, hitScore, Direction.RIGHT, frames, ticksPerFrame);

@@ -43,8 +43,7 @@ h3 {
   font-size: 28pt;
   padding-bottom: 0;
   padding-top: 0;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin: 10px 10px 10px 10px;
   width: 300px;
 }
 
@@ -68,12 +67,17 @@ h3 {
   font-size: 20pt;
   padding-bottom: 0;
   padding-top: 0;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin: 10px 10px 10px 10px;
   width: 200px;
 }
 
 .btn-main-md:hover {
+  background-color: rgba(41, 41, 41, 0.8);
+  color: #ffffff;
+  border: solid rgba(41, 41, 41, 0);
+}
+
+.btn-main-md:disabled {
   background-color: rgba(41, 41, 41, 0.8);
   color: #ffffff;
   border: solid rgba(41, 41, 41, 0);
