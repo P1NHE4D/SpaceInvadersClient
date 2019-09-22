@@ -2,16 +2,16 @@
 <canvas #canvas ></canvas>
 <div class="score-bar">
   <div class="flex-container-left left">
-    <p class="red" *ngIf="playerOne">P1 Score: {{playerOne.getScore()}}</p>
-    <p class="red" *ngIf="playerOne">P1 Lives: {{playerOne.getLives()}}</p>
+    <p class="red" *ngIf="this.gameLogic.getPlayer('playerOne')">P1 Score: {{this.gameLogic.getPlayer('playerOne').getScore()}}</p>
+    <p class="red" *ngIf="this.gameLogic.getPlayer('playerOne')">P1 Lives: {{this.gameLogic.getPlayer('playerOne').getLives()}}</p>
   </div>
   <div class="flex-container-left right">
-    <p class="blue" *ngIf="playerTwo">P2 Score: {{playerTwo.getScore()}}</p>
-    <p class="blue" *ngIf="playerTwo">P2 Lives: {{playerTwo.getLives()}}</p>
+    <p class="blue" *ngIf="this.gameLogic.getPlayer('playerTwo')">P2 Score: {{this.gameLogic.getPlayer('playerTwo').getScore()}}</p>
+    <p class="blue" *ngIf="this.gameLogic.getPlayer('playerTwo')">P2 Lives: {{this.gameLogic.getPlayer('playerTwo').getLives()}}</p>
   </div>
 </div>
 
-<div class="modal" [ngStyle]="{'display': displayStartModal}">
+<div class="modal" [ngStyle]="{'display': displayPreGameModal}">
     <div class="flex-container-center">
       <h2 class="main-title mb-20" *ngIf="shipsSelected">Ready?</h2>
       <p class="mb-10" *ngIf="!shipsSelected">Player 1: Select a Battleship</p>
@@ -35,7 +35,7 @@
         <button class="btn-main-md" routerLink="/"><i class="fa fa-times"></i> Abort Mission</button>
         <button class="btn-main-md" *ngIf="!gameLoaded" disabled><i class="fa fa-spinner fa-pulse"></i> Loading...</button>
         <button class="btn-main-md" *ngIf="gameLoaded && !shipsSelected" (click)="setupGame(); confirmSelection();"><i class="fa fa-check"></i> Confirm</button>
-        <button class="btn-main-md" *ngIf="gameLoaded && shipsSelected" (click)="hideStartModal(); gameLoop();"><i class="fa fa-rocket"></i> Launch</button>
+        <button class="btn-main-md" *ngIf="gameLoaded && shipsSelected" (click)="hidePreGameModal(); gameLoop();"><i class="fa fa-rocket"></i> Launch</button>
       </div>
 
     </div>
@@ -44,10 +44,10 @@
 <div class="modal" [ngStyle]="{'display': displayGameOverModal}">
     <div class="flex-container-center">
       <h2 class="main-title">Game Over</h2>
-      <h3 *ngIf="playerOne" class="red mt-20">Player 1 Score: {{playerOne.getScore()}}</h3>
-      <h3 *ngIf="playerTwo" class="blue mb-20">Player 2 Score: {{playerTwo.getScore()}}</h3>
-      <input *ngIf="playerOne" class="custom-input mt-20" placeholder="Player 1 Name">
-      <input *ngIf="playerTwo" class="custom-input mt-20 mb-20" placeholder="Player 2 Name">
+      <h3 *ngIf="this.gameLogic.getPlayer('playerOne')" class="red mt-20">Player 1 Score: {{this.gameLogic.getPlayer('playerOne').getScore()}}</h3>
+      <h3 *ngIf="this.gameLogic.getPlayer('playerTwo')" class="blue mb-20">Player 2 Score: {{this.gameLogic.getPlayer('playerTwo').getScore()}}</h3>
+      <input *ngIf="this.gameLogic.getPlayer('playerOne')" class="custom-input mt-20" placeholder="Player 1 Name">
+      <input *ngIf="this.gameLogic.getPlayer('playerTwo')" class="custom-input mt-20 mb-20" placeholder="Player 2 Name">
       <!-- TODO: Submit scores to server -->
       <button class="btn btn-main-md mt-20" routerLink="/highscores">Submit</button>
     </div>

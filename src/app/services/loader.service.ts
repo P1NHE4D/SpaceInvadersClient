@@ -24,11 +24,8 @@ export class LoaderService {
     return this.loadedImages.get(name);
   }
 
-  /**
-   * @return a map containing all loaded audio files
-   */
-  getAudioFiles(): Map<string, HTMLAudioElement> {
-    return this.loadedAudioFiles;
+  getAudio(name: string): HTMLAudioElement {
+    return this.loadedAudioFiles.get(name);
   }
 
   /**
@@ -54,7 +51,7 @@ export class LoaderService {
     } else {
       setTimeout(() => {
         this.resourcesLoaded();
-      }, 10);
+      }, 100);
     }
   }
 
@@ -71,13 +68,13 @@ export class LoaderService {
 
   private preloadAudio(audio: FileDict, onload: () => any, onerror: () => any): void {
     this.loadedAudioFiles.set(audio.name, new Audio());
-    this.loadedAudioFiles.get(audio.name).onload = () => {
-      onload();
-    };
+    this.loadedAudioFiles.get(audio.name).src = audio.src;
+    this.loadedAudioFiles.get(audio.name).load();
+    onload();
     this.loadedAudioFiles.get(audio.name).onerror = () => {
       onerror();
     };
-    this.loadedAudioFiles.get(audio.name).src = audio.src;
+
   }
 
   private load(resource, onload: () => any, onerror: () => any): void {

@@ -2,6 +2,7 @@ import {Direction, GameObject} from "./GameObject";
 
 export class Bullet extends GameObject {
   private readonly movementSpeed: number = 2;
+  // TODO: add bullet origin
 
   /**
    * Instantiates a new bullet
@@ -9,18 +10,14 @@ export class Bullet extends GameObject {
    * @param xPos initial x-position of the bullet
    * @param yPos initial y-position of the bullet
    * @param ctx canvas rendering context
-   * @param frames number of frames per image
-   * @param ticksPerFrame ticks between switching from one frame to the next
    */
   constructor(
     image: HTMLImageElement,
     ctx: CanvasRenderingContext2D,
     xPos: number,
-    yPos: number,
-    frames?: number,
-    ticksPerFrame?: number
+    yPos: number
   ) {
-    super(image, xPos, yPos, ctx, frames, ticksPerFrame);
+    super(image, xPos, yPos, ctx);
   }
 
   /**

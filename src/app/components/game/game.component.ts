@@ -1,8 +1,5 @@
 import {Component, ElementRef, HostListener, Input, OnInit, ViewChild} from '@angular/core';
-import {Bullet} from "../../game-objects/Bullet";
 import {LoaderService} from "../../services/loader.service";
-import {Battleship} from "../../game-objects/Battleship";
-import {Enemy} from "../../game-objects/Enemy";
 import {GameLogicService} from "../../services/game-logic.service";
 import {Explosion} from "../../game-objects/Explosion";
 import {Location} from "@angular/common";
@@ -17,7 +14,7 @@ export class GameComponent implements OnInit {
   @Input() multiplayer: boolean = false;
   @ViewChild('canvas', { static: true })
   private canvas: ElementRef;
-  private displayStartModal: string = 'block';
+  private displayPreGameModal: string = 'block';
   private displayGameOverModal: string = 'none';
 
   private ctx: CanvasRenderingContext2D;
@@ -26,21 +23,13 @@ export class GameComponent implements OnInit {
   private playerTwoSelectedBattleship: HTMLImageElement;
   private shipsSelected: boolean = false;
 
-  private playerOne: Battleship;
-  private playerOneBullets: Bullet[] = [];
-  private playerTwo: Battleship;
-  private playerTwoBullets: Bullet[] = [];
-  private enemies: Enemy[] = [];
-  private enemyBullets: Bullet[] = [];
-  private explosions: Explosion[] = [];
-  private gameOver: boolean = false;
   private numbOfEnemyRows: number = 4;
-  // TODO: Replace cooldown and fireCooldown
   private ticksBetweenMoves: number = 20;
   private movementTicksCount: number = 0;
   private ticksBetweenShots: number = 90;
   private shotTicksCount: number = 0;
   private gameLoaded: boolean = false;
+  private gameSetup: boolean = false;
   private level: number = 1;
 
 
@@ -65,48 +54,43 @@ export class GameComponent implements OnInit {
       this.playerTwoSelectedBattleship = this.loader.getImage('RedFighter');
       this.gameLoaded = true;
     });
-    this.loadFiles();
+    this.loadGameResources();
   }
 
   // TODO: Improve key handling to improve overall gameplay experience and smoothness
   // TODO: when both player hold down their movement keys, no player moves
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvents(event: KeyboardEvent): void {
-    if (this.gameLoaded) {
-      let bullet: Bullet;
+    if (this.gameLoaded && this.gameSetup) {
       switch (event.key) {
         case("ArrowUp"):
-          bullet = this.gameLogic.fireBullet(this.playerOne, this.loader.getImage('PlayerOneBullet'), this.ctx);
-          this.playerOneBullets.push(bullet);
+          this.gameLogic.fireBullet("playerOne", this.loader.getImage("PlayerOneBullet"), this.ctx);
           break;
         case("ArrowLeft"):
-          this.gameLogic.movePlayerLeft(this.playerOne);
+          this.gameLogic.movePlayerLeft("playerOne");
           break;
         case("ArrowRight"):
-          this.gameLogic.movePlayerRight(this.playerOne);
+          this.gameLogic.movePlayerRight("playerOne");
           break;
       }
       if (this.multiplayer) {
         switch(event.key) {
           case("w"):
-            let bullet: Bullet = this.gameLogic.fireBullet(this.playerTwo, this.loader.getImage('PlayerTwoBullet'), this.ctx);
-            this.playerTwoBullets.push(bullet);
+            this.gameLogic.fireBullet("playerTwo", this.loader.getImage("PlayerTwoBullet"), this.ctx);
             break;
           case("a"):
-            this.gameLogic.movePlayerLeft(this.playerTwo);
+            this.gameLogic.movePlayerLeft("playerTwo");
             break;
           case("d"):
-            this.gameLogic.movePlayerRight(this.playerTwo);
+            this.gameLogic.movePlayerRight("playerTwo");
             break;
         }
       }
     }
   }
 
-  /**
-   * Load game assets
-   */
-  loadFiles(): void {
+  // Loads all assets used in the game
+  private loadGameResources(): void {
     this.loader.preload([
       {name: 'RedFighter', type: 'image', src: '/assets/gameObjects/RedFighter.png'},
       {name: 'BlueFighter', type: 'image', src: '/assets/gameObjects/BlueFighter.png'},
@@ -122,191 +106,57 @@ export class GameComponent implements OnInit {
     ]);
   }
 
-  setupGame(): void {
-    this.spawnEnemies();
+  // Spawns player(s) and enemies
+  private setupGame(): void {
+
     let playerImage = this.playerOneSelectedBattleship;
-    this.playerOne = this.gameLogic.spawnPlayer(
-      playerImage,
-      this.ctx,
-      (this.ctx.canvas.width / 2) - playerImage.width / 2,
-      this.ctx.canvas.height
-    );
+    let x: number = (this.ctx.canvas.width / 2) - playerImage.width / 2;
+    let y: number = this.ctx.canvas.height;
+    this.gameLogic.spawnPlayer("playerOne", playerImage, this.ctx, x, y);
+
     if (this.multiplayer) {
       playerImage = this.playerTwoSelectedBattleship;
-      this.playerTwo = this.gameLogic.spawnPlayer(
-        playerImage,
-        this.ctx,
-        (this.ctx.canvas.width / 2) + playerImage.width,
-        this.ctx.canvas.height
-      );
+      x = (this.ctx.canvas.width / 2) + playerImage.width;
+      this.gameLogic.spawnPlayer("playerTwo", playerImage, this.ctx, x, y);
     }
+
+    this.spawnEnemies();
+    this.gameSetup = true;
   }
 
-  gameLoop = () => {
+  private gameLoop = () => {
     //TODO: spawn special enemies, e.g. ISS, UFO, nyan-nyan cat
     //TODO: add background music
-    if (this.gameOver) {
-      // TODO: submit score to server and switch to high score view
+    if (this.gameLogic.gameIsOver()) {
       this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
       this.displayGameOverModal = 'block';
+      // TODO: submit score to server and switch to high score view
       return;
     }
-
-    //Check for player bullet intersections
-    // TODO: Extract method
-    this.gameLogic.checkForBulletIntersections(this.playerOneBullets, this.enemies, (object, bullet) => {
-      let enemy: Enemy = object as Enemy;
-      let index = this.enemies.indexOf(enemy);
-      let explosion = new Explosion(this.loader.getImage("Explosion"), enemy.getX(), enemy.getY(), this.ctx, 32, 1);
-      this.explosions.push(explosion);
-      // TODO: Add explosion sound
-      this.enemies.splice(index, 1);
-      index = this.playerOneBullets.indexOf(bullet);
-      this.playerOneBullets.splice(index, 1);
-      if ((this.playerOne.getScore() % 1000) + enemy.getHitScore() >= 1000) {
-        this.playerOne.addLife();
-      }
-      this.playerOne.addToScore(enemy.getHitScore());
-    });
-    if (this.multiplayer) {
-      this.gameLogic.checkForBulletIntersections(this.playerTwoBullets, this.enemies, (object, bullet) => {
-        let enemy: Enemy = object as Enemy;
-        let index = this.enemies.indexOf(enemy);
-        let explosion = new Explosion(this.loader.getImage("Explosion"), enemy.getX(), enemy.getY(), this.ctx, 32, 1);
-        this.explosions.push(explosion);
-        this.enemies.splice(index, 1);
-        index = this.playerTwoBullets.indexOf(bullet);
-        this.playerTwoBullets.splice(index, 1);
-        if ((this.playerTwo.getScore() % 1000) + enemy.getHitScore() >= 1000) {
-          this.playerTwo.addLife();
-        }
-        this.playerTwo.addToScore(enemy.getHitScore());
-      });
-    }
-
-    // Check enemy bullet intersections
-    this.gameLogic.checkForBulletIntersection(this.enemyBullets, this.playerOne, (bullet) => {
-      let index = this.enemyBullets.indexOf(bullet);
-      this.enemyBullets.splice(index, 1);
-      let image = this.loader.getImage("BigExplosion");
-      let x = this.playerOne.getX();
-      let y = this.playerOne.getY();
-      /*
-      if (x + image.width > this.ctx.canvas.width) {
-        x -= (x + image.width - this.ctx.canvas.width);
-      }
-      if (y + image.height > this.ctx.canvas.height) {
-        y = y - 20;
-      }*/
-      let explosion = new Explosion(
-        image,
-        x,
-        y,
-        this.ctx,
-        32,
-        1);
-      this.explosions.push(explosion);
-      this.playerOne.removeLife();
-      if (this.playerOne.getLives() === 0) {
-        this.gameOver = true;
-      }
-      //TODO: Add explosion sound and animation
-      //TODO: Stop game loop if enemy hit player and respawn player after pressing a button
-    });
-    if (this.multiplayer) {
-      this.gameLogic.checkForBulletIntersection(this.enemyBullets, this.playerTwo, (bullet) => {
-        let index = this.enemyBullets.indexOf(bullet);
-        this.enemyBullets.splice(index, 1);
-        this.playerTwo.removeLife();
-        if (this.playerTwo.getLives() === 0) {
-          this.gameOver = true;
-        }
-        //TODO: Add explosion sound and animation
-        //TODO: Stop game loop if enemy hit player and respawn player after pressing a button
-        //TODO: Game over if enemies reached the lower boundary of the game
-      });
-    }
-
-    // Respawn enemies and increase difficulty
-    if (this.enemies.length === 0) {
+    this.gameLogic.checkForPlayerBulletIntersections(this.loader.getImage("Explosion"), this.ctx, 32, 1);
+    this.gameLogic.checkForEnemyBulletIntersections(this.loader.getImage("BigExplosion"), this.ctx, 32, 1);
+    if (this.gameLogic.enemiesRemaining() === 0) {
       ++this.level;
-      if (this.numbOfEnemyRows <= 7 && this.level % 2 === 0) {
-        ++this.numbOfEnemyRows;
-      }
-      if (this.ticksBetweenShots >= 60 && this.level % 3 === 0) {
-        this.ticksBetweenShots -= 10;
-      }
-      if (this.ticksBetweenMoves >= 10 && this.level % 5 === 0) {
-        this.ticksBetweenMoves -= 5;
-      }
+      this.increaseDifficulty();
       this.spawnEnemies();
     }
-
-    // move bullets
-    this.gameLogic.moveBulletsUp(this.playerOneBullets, (bullet) => {
-      let index = this.playerOneBullets.indexOf(bullet);
-      this.playerOneBullets.splice(index, 1);
-    });
-    if (this.multiplayer) {
-      this.gameLogic.moveBulletsUp(this.playerTwoBullets, (bullet) => {
-        let index = this.playerTwoBullets.indexOf(bullet);
-        this.playerTwoBullets.splice(index, 1);
-      });
-    }
-    this.gameLogic.moveBulletsDown(this.enemyBullets, (bullet) => {
-      let index = this.enemyBullets.indexOf(bullet);
-      this.enemyBullets.splice(index, 1);
-    });
-
-    // move enemies
+    this.gameLogic.movePlayerBullets();
+    this.gameLogic.moveEnemyBullets();
     if ((++this.movementTicksCount) === this.ticksBetweenMoves) {
       this.movementTicksCount = 0;
-      this.gameLogic.moveEnemies(this.enemies);
+      this.gameLogic.moveEnemies();
     }
-
-    // initiate enemy fire
     if ((++this.shotTicksCount) === this.ticksBetweenShots) {
       this.shotTicksCount = 0;
-      let randomIndex = Math.floor(Math.random() * this.enemies.length);
-      let randomEnemy = this.enemies[randomIndex];
-      let bullet = this.gameLogic.fireBullet(randomEnemy, this.loader.getImage('EnemyBullet'), this.ctx);
-      this.enemyBullets.push(bullet);
+      this.gameLogic.fireEnemyBullet(this.loader.getImage("EnemyBullet"), this.ctx);
     }
-
-    // redraw all objects
     requestAnimationFrame(this.gameLoop);
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-    this.redrawObjects();
+    this.gameLogic.renderGameObjects();
   };
 
-  redrawObjects(): void {
-    this.playerOne.render();
-    for (let explosion of this.explosions) {
-      explosion.render();
-      explosion.update(() => {
-        let index = this.explosions.indexOf(explosion);
-        this.explosions.splice(index, 1);
-      });
-    }
-    for (let enemy of this.enemies) {
-      enemy.render();
-      enemy.update();
-    }
-    for (let bullet of this.playerOneBullets) {
-      bullet.render();
-    }
-    for (let bullet of this.enemyBullets) {
-      bullet.render();
-    }
-    if (this.multiplayer) {
-      this.playerTwo.render();
-      for (let bullet of this.playerTwoBullets) {
-        bullet.render();
-      }
-    }
-  }
-
-  spawnEnemies(): void {
+  // Spawns rows of enemies
+  private spawnEnemies(): void {
     for (let j = 0; j < this.numbOfEnemyRows; ++j) {
       let img: HTMLImageElement;
       let hitScore: number;
@@ -324,23 +174,40 @@ export class GameComponent implements OnInit {
           hitScore = 30;
           break;
       }
-      this.enemies = this.enemies.concat(this.gameLogic.spawnEnemyRow(img, this.ctx, (j * (img.height + 10)), hitScore, 2, 30));
+      this.gameLogic.spawnEnemyRow(img, this.ctx, hitScore, 2, 30);
     }
   }
 
-  hideStartModal(): void {
-    this.displayStartModal = 'none';
+  // Increases the difficulty of the game according to the current level
+  private increaseDifficulty(): void {
+    if (this.numbOfEnemyRows <= 7 && this.level % 2 === 0) {
+      ++this.numbOfEnemyRows;
+    }
+    if (this.ticksBetweenShots >= 60 && this.level % 3 === 0) {
+      this.ticksBetweenShots -= 10;
+    }
+    if (this.ticksBetweenMoves >= 10 && this.level % 5 === 0) {
+      this.ticksBetweenMoves -= 5;
+    }
   }
 
-  selectPlayerOneShip(image: HTMLImageElement): void {
+  // hides the pre-game modal window
+  private hidePreGameModal(): void {
+    this.displayPreGameModal = 'none';
+  }
+
+  // sets the battleship image selected by player one
+  private selectPlayerOneShip(image: HTMLImageElement): void {
     this.playerOneSelectedBattleship = image;
   }
 
-  selectPlayerTwoShip(image: HTMLImageElement): void {
+  // sets the battleship image selected by player two
+  private selectPlayerTwoShip(image: HTMLImageElement): void {
     this.playerTwoSelectedBattleship = image;
   }
 
-  confirmSelection(): void {
+  // confirms the ship selection
+  private confirmSelection(): void {
     this.shipsSelected = true;
   }
 }
