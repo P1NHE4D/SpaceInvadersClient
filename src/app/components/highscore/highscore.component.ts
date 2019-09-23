@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import {Location} from "@angular/common";
+import {HighScoreService} from "../../services/high-score.service";
+import {SpHighScore} from "../../models/sp-high-score";
+import {MpHighScore} from "../../models/mp-high-score";
 
 @Component({
   selector: 'app-highscore',
@@ -7,14 +9,32 @@ import {Location} from "@angular/common";
   styleUrls: ['./highscore.component.css']
 })
 export class HighscoreComponent implements OnInit {
+  private spHighScores: SpHighScore[];
+  private mpHighScores: MpHighScore[];
 
-  constructor(private location: Location) { }
+  constructor(private highScoreService: HighScoreService) { }
 
   ngOnInit() {
+    this.getSpHighScores();
+    this.getMpHighScores();
   }
 
-  goBack() {
-    this.location.back();
+  /**
+   * Retrieves all single player high scores from server
+   */
+  getSpHighScores(): void {
+    this.highScoreService.getSpHighScores<SpHighScore[]>().subscribe(
+      scores => this.spHighScores = scores
+    );
+  }
+
+  /**
+   * Retrieves all multi player high scores from server
+   */
+  getMpHighScores(): void {
+    this.highScoreService.getMpHighScores<MpHighScore[]>().subscribe(
+      scores => this.mpHighScores = scores
+    );
   }
 
 }

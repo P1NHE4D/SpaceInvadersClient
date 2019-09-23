@@ -8,6 +8,7 @@ import {LoaderService} from "../../services/loader.service";
 })
 export class MainMenuComponent implements OnInit {
 
+
   private status: string = 'None';
 
   constructor() {
@@ -16,4 +17,5 @@ export class MainMenuComponent implements OnInit {
   ngOnInit() {
 
   }
+
 }

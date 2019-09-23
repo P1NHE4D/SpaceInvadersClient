@@ -10,6 +10,7 @@ import { MultiplayerComponent } from './components/multiplayer/multiplayer.compo
 import { HighscoreComponent } from './components/highscore/highscore.component';
 import {FormsModule} from "@angular/forms";
 import {AngularFontAwesomeModule} from "angular-font-awesome";
+import {HttpClientModule} from "@angular/common/http";
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import {AngularFontAwesomeModule} from "angular-font-awesome";
     AppRoutingModule,
     FormsModule,
     AngularFontAwesomeModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]
