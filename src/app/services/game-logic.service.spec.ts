@@ -2,6 +2,8 @@ import { TestBed } from '@angular/core/testing';
 
 import { GameLogicService } from './game-logic.service';
 
+// TODO: Unit test
+
 describe('GameLogicService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));
 

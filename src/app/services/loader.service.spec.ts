@@ -2,6 +2,8 @@ import { TestBed } from '@angular/core/testing';
 
 import { LoaderService } from './loader.service';
 
+// TODO: Unit test
+
 describe('LoaderService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));
 

@@ -2,6 +2,8 @@ import { TestBed } from '@angular/core/testing';
 
 import { HighScoreService } from './high-score.service';
 
+// TODO: Unit test
+
 describe('HighScoreService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));
 
