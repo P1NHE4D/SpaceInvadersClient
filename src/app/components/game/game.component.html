@@ -47,12 +47,12 @@
       <h3 *ngIf="this.gameLogic.getPlayer('playerOne')" class="red mt-20">Player 1 Score: {{this.gameLogic.getPlayer('playerOne').getScore()}}</h3>
       <h3 *ngIf="this.gameLogic.getPlayer('playerTwo')" class="blue mb-20">Player 2 Score: {{this.gameLogic.getPlayer('playerTwo').getScore()}}</h3>
       <form *ngIf="!multiplayer" [formGroup]="spHighScoreForm" (ngSubmit)="submitHighScore()">
-        <input formControlName="playerOneName" class="custom-input mt-20" placeholder="Player 1 Name" required>
+        <input formControlName="playerOneName" type="text" class="custom-input mt-20" placeholder="Player 1 Name" required>
         <button class="btn btn-main-md mt-20" type="submit" [disabled]="!spHighScoreForm.valid">Submit</button>
       </form>
       <form *ngIf="multiplayer" [formGroup]="mpHighScoreForm" (ngSubmit)="submitHighScore()">
-        <input formControlName="playerOneName" class="custom-input mt-20" placeholder="Player 1 Name" required>
-        <input formControlName="playerTwoName" class="custom-input mt-20 mb-20" placeholder="Player 2 Name" required>
+        <input formControlName="playerOneName" type="text" class="custom-input mt-20" placeholder="Player 1 Name" required>
+        <input formControlName="playerTwoName" type="text" class="custom-input mt-20 mb-20" placeholder="Player 2 Name" required>
         <button class="btn btn-main-md mt-20" type="submit" [disabled]="!mpHighScoreForm.valid">Submit</button>
       </form>
 

@@ -4,7 +4,7 @@ import {GameLogicService} from "../../services/game-logic.service";
 import {Explosion} from "../../game-objects/Explosion";
 import {Location} from "@angular/common";
 import {HighScoreService} from "../../services/high-score.service";
-import {FormControl, FormGroup} from "@angular/forms";
+import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {MpHighScore} from "../../models/mp-high-score";
 import {SpHighScore} from "../../models/sp-high-score";
 import {Router} from "@angular/router";
@@ -37,13 +37,8 @@ export class GameComponent implements OnInit {
   private gameSetup: boolean = false;
   private level: number = 1;
 
-  private spHighScoreForm: FormGroup = new FormGroup({
-    playerOneName: new FormControl()
-  });
-  private mpHighScoreForm: FormGroup = new FormGroup({
-    playerOneName: new FormControl(),
-    playerTwoName: new FormControl()
-  });
+  private spHighScoreForm: FormGroup;
+  private mpHighScoreForm: FormGroup;
 
 
   constructor(
@@ -51,10 +46,18 @@ export class GameComponent implements OnInit {
     private loader: LoaderService,
     private gameLogic: GameLogicService,
     private highScoreService: HighScoreService,
-    private router: Router
+    private router: Router,
+    private formBuilder: FormBuilder
   ) {}
 
   ngOnInit() {
+    this.spHighScoreForm = this.formBuilder.group({
+      playerOneName: ['', Validators.compose([Validators.required, Validators.maxLength(20)])]
+    });
+    this.mpHighScoreForm = this.formBuilder.group({
+      playerOneName: ['', Validators.compose([Validators.required, Validators.maxLength(20)])],
+      playerTwoName: ['', Validators.compose([Validators.required, Validators.maxLength(20)])]
+    });
     const canvasEl: HTMLCanvasElement = this.canvas.nativeElement;
     this.ctx = canvasEl.getContext('2d');
     this.ctx.canvas.width = 700;
