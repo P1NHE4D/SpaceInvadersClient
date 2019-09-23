@@ -2,6 +2,7 @@
 html, body {
   height: 100%;
   margin: 0;
+  overflow: auto;
 }
 
 @font-face {
@@ -45,6 +46,7 @@ h3 {
   padding-top: 0;
   margin: 10px 10px 10px 10px;
   width: 300px;
+  min-height: 60px;
 }
 
 .btn-main-lg:hover {
@@ -164,4 +166,37 @@ input.custom-input:focus {
 
 .mb-10 {
   margin-bottom: 10px !important;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: none;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #FF0000;
+}
+
+.flex-container-left {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  flex-direction: column;
+  justify-content: left;
+}
+
+.left {
+  float: left;
+}
+
+.right {
+  float: right;
 }

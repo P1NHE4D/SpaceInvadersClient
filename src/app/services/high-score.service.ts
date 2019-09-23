@@ -22,14 +22,14 @@ export class HighScoreService {
    * Adds a high score entry to the database
    * @param highScoreEntry single or multi player high score
    */
-  addScore<T extends SpHighScore | MpHighScore>(highScoreEntry: T): Observable<T> {
-    let url: string;
-    if (highScoreEntry instanceof SpHighScore) {
-      url = `${this.baseUrl}/sp-high-score`
-    } else {
-      url = `${this.baseUrl}/mp-high-score`
-    }
-    return this.http.post<T>(url, highScoreEntry, this.httpOptions).pipe(
+  addSpHighScore<T extends SpHighScore>(highScoreEntry: T): Observable<T> {
+    return this.http.post<T>(`${this.baseUrl}/sp-high-score`, highScoreEntry, this.httpOptions).pipe(
+      catchError(this.handleError<T>())
+    );
+  }
+
+  addMpHighScore<T extends MpHighScore>(highScoreEntry: T): Observable<T> {
+    return this.http.post<T>(`${this.baseUrl}/mp-high-score`, highScoreEntry, this.httpOptions).pipe(
       catchError(this.handleError<T>())
     );
   }

@@ -1,4 +1,45 @@
 <div class="flex-container-center">
+  <h2 class="main-title">Highscores</h2>
+  <p class="mt-20">Singleplayer</p>
+  <div class="score-table mb-20">
+    <table>
+      <thead>
+      <tr>
+        <th>Rank</th>
+        <th>P1 Name</th>
+        <th>Score</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let entry of spHighScores | slice:0:10; let i = index">
+        <td>{{i + 1}}</td>
+        <td>{{entry.playerOneName}}</td>
+        <td>{{entry.score}}</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="mt-20">2-Player Coop</p>
+  <div class="score-table mb-20">
+    <table>
+      <thead>
+      <tr>
+        <th>Rank</th>
+        <th>P1 Name</th>
+        <th>P2 Name</th>
+        <th>Score</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let entry of mpHighScores; let i = index">
+        <td>{{i + 1}}</td>
+        <td>{{entry.playerOneName}}</td>
+        <td>{{entry.playerTwoName}}</td>
+        <td>{{entry.score}}</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
   <button class="btn btn-main-lg" routerLink="/">Main Menu</button>
-  <!-- TODO: Add high score table -->
 </div>

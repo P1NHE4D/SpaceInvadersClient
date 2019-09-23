@@ -3,6 +3,11 @@ import {LoaderService} from "../../services/loader.service";
 import {GameLogicService} from "../../services/game-logic.service";
 import {Explosion} from "../../game-objects/Explosion";
 import {Location} from "@angular/common";
+import {HighScoreService} from "../../services/high-score.service";
+import {FormControl, FormGroup} from "@angular/forms";
+import {MpHighScore} from "../../models/mp-high-score";
+import {SpHighScore} from "../../models/sp-high-score";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-game',
@@ -32,11 +37,21 @@ export class GameComponent implements OnInit {
   private gameSetup: boolean = false;
   private level: number = 1;
 
+  private spHighScoreForm: FormGroup = new FormGroup({
+    playerOneName: new FormControl()
+  });
+  private mpHighScoreForm: FormGroup = new FormGroup({
+    playerOneName: new FormControl(),
+    playerTwoName: new FormControl()
+  });
+
 
   constructor(
     private location: Location,
     private loader: LoaderService,
-    private gameLogic: GameLogicService
+    private gameLogic: GameLogicService,
+    private highScoreService: HighScoreService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -130,7 +145,6 @@ export class GameComponent implements OnInit {
     if (this.gameLogic.gameIsOver()) {
       this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
       this.displayGameOverModal = 'block';
-      // TODO: submit score to server and switch to high score view
       return;
     }
     this.gameLogic.checkForPlayerBulletIntersections(this.loader.getImage("Explosion"), this.ctx, 32, 1);
@@ -209,5 +223,31 @@ export class GameComponent implements OnInit {
   // confirms the ship selection
   private confirmSelection(): void {
     this.shipsSelected = true;
+  }
+
+  // Submits high score to server
+  private submitHighScore(): void {
+    let playerOneName: string;
+    let score = this.gameLogic.getPlayerScore("playerOne");
+    if(this.multiplayer) {
+      let playerTwoName: string;
+      playerOneName = this.mpHighScoreForm.value.playerOneName.trim();
+      playerTwoName = this.mpHighScoreForm.value.playerTwoName.trim();
+      if (!playerOneName || !playerTwoName) {
+        return;
+      }
+      score += this.gameLogic.getPlayerScore("playerTwo");
+      this.highScoreService.addMpHighScore<MpHighScore>({playerOneName, playerTwoName, score} as MpHighScore).subscribe(
+        () => this.router.navigateByUrl('/highscores')
+      );
+    } else {
+      playerOneName = this.spHighScoreForm.value.playerOneName.trim();
+      if (!playerOneName) {
+        return;
+      }
+      this.highScoreService.addSpHighScore<SpHighScore>({playerOneName, score} as SpHighScore).subscribe(
+        () => this.router.navigateByUrl('/highscores')
+      );
+    }
   }
 }

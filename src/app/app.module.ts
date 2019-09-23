@@ -8,7 +8,7 @@ import { SingleplayerComponent } from './components/singleplayer/singleplayer.co
 import { GameComponent } from './components/game/game.component';
 import { MultiplayerComponent } from './components/multiplayer/multiplayer.component';
 import { HighscoreComponent } from './components/highscore/highscore.component';
-import {FormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {AngularFontAwesomeModule} from "angular-font-awesome";
 import {HttpClientModule} from "@angular/common/http";
 
@@ -26,7 +26,8 @@ import {HttpClientModule} from "@angular/common/http";
     AppRoutingModule,
     FormsModule,
     AngularFontAwesomeModule,
-    HttpClientModule
+    HttpClientModule,
+    ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
