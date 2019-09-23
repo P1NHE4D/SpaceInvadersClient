@@ -2,7 +2,6 @@ import {Direction, GameObject} from "./GameObject";
 
 export class Bullet extends GameObject {
   private readonly movementSpeed: number = 2;
-  // TODO: add bullet origin
 
   /**
    * Instantiates a new bullet
@@ -25,7 +24,7 @@ export class Bullet extends GameObject {
    * @param direction Direction in which the bullet is supposed to travel
    * @param boundaryReached Function that should be called as soon as the bullet reaches the boundary
    */
-  move(direction: Direction, boundaryReached: () => any): void {
+  move(direction: Direction, boundaryReached?: () => any): void {
     switch(direction) {
       case Direction.UP:
         if (this.yPos - this.movementSpeed > 0) {
