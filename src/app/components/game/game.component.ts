@@ -4,7 +4,7 @@ import {GameLogicService} from "../../services/game-logic.service";
 import {Explosion} from "../../game-objects/Explosion";
 import {Location} from "@angular/common";
 import {HighScoreService} from "../../services/high-score.service";
-import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {MpHighScore} from "../../models/mp-high-score";
 import {SpHighScore} from "../../models/sp-high-score";
 import {Router} from "@angular/router";
@@ -16,6 +16,10 @@ import {Router} from "@angular/router";
   providers: [GameLogicService]
 })
 export class GameComponent implements OnInit {
+  // TODO: Rename component
+  // TODO: Rename all class instance variables
+  // TODO: Remove private modifiers from methods accessed by template
+
   @Input() multiplayer: boolean = false;
   @ViewChild('canvas', { static: true })
   private canvas: ElementRef;
@@ -110,17 +114,17 @@ export class GameComponent implements OnInit {
   // Loads all assets used in the game
   private loadGameResources(): void {
     this.loader.preload([
-      {name: 'RedFighter', type: 'image', src: '/assets/gameObjects/RedFighter.png'},
-      {name: 'BlueFighter', type: 'image', src: '/assets/gameObjects/BlueFighter.png'},
-      {name: 'A318', type: 'image', src: '/assets/gameObjects/A318.png'},
-      {name: 'PlayerOneBullet', type: 'image', src: '/assets/gameObjects/PlayerOneBullet.png'},
-      {name: 'PlayerTwoBullet', type: 'image', src: '/assets/gameObjects/PlayerTwoBullet.png'},
-      {name: 'EnemyBullet', type: 'image', src: '/assets/gameObjects/EnemyBullet.png'},
-      {name: 'Android', type: 'image', src: '/assets/gameObjects/AndroidAlien.png'},
-      {name: 'Squid', type: 'image', src: '/assets/gameObjects/SquidAlien.png'},
-      {name: 'Death', type: 'image', src: '/assets/gameObjects/DeathAlien.png'},
-      {name: 'Explosion', type: 'image', src: '/assets/gameObjects/Explosion.png'},
-      {name: 'BigExplosion', type: 'image', src: '/assets/gameObjects/BigExplosion.png'},
+      {name: 'RedFighter', type: 'image', src: '/assets/game-assets/RedFighter.png'},
+      {name: 'BlueFighter', type: 'image', src: '/assets/game-assets/BlueFighter.png'},
+      {name: 'A318', type: 'image', src: '/assets/game-assets/A318.png'},
+      {name: 'PlayerOneBullet', type: 'image', src: '/assets/game-assets/PlayerOneBullet.png'},
+      {name: 'PlayerTwoBullet', type: 'image', src: '/assets/game-assets/PlayerTwoBullet.png'},
+      {name: 'EnemyBullet', type: 'image', src: '/assets/game-assets/EnemyBullet.png'},
+      {name: 'Android', type: 'image', src: '/assets/game-assets/AndroidAlien.png'},
+      {name: 'Squid', type: 'image', src: '/assets/game-assets/SquidAlien.png'},
+      {name: 'Death', type: 'image', src: '/assets/game-assets/DeathAlien.png'},
+      {name: 'Explosion', type: 'image', src: '/assets/game-assets/Explosion.png'},
+      {name: 'BigExplosion', type: 'image', src: '/assets/game-assets/BigExplosion.png'},
     ]);
   }
 
@@ -172,6 +176,7 @@ export class GameComponent implements OnInit {
     this.gameLogic.renderGameObjects();
   };
 
+  // TODO: Move method to game logic
   // Spawns rows of enemies
   private spawnEnemies(): void {
     for (let j = 0; j < this.numbOfEnemyRows; ++j) {
@@ -195,6 +200,7 @@ export class GameComponent implements OnInit {
     }
   }
 
+  // TODO: Move method to game logic
   // Increases the difficulty of the game according to the current level
   private increaseDifficulty(): void {
     if (this.numbOfEnemyRows <= 7 && this.level % 2 === 0) {

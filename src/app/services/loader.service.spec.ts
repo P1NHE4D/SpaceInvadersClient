@@ -17,9 +17,9 @@ describe('LoaderService', () => {
   it('should preload all images', async() => {
     const service: LoaderService = TestBed.get(LoaderService);
     files = [
-      {name: 'RedFighter', type: 'image', src: '/assets/gameObjects/RedFighter.png'},
-      {name: 'BlueFighter', type: 'image', src: '/assets/gameObjects/BlueFighter.png'},
-      {name: 'A318', type: 'image', src: '/assets/gameObjects/A318.png'}
+      {name: 'RedFighter', type: 'image', src: '/assets/game-assets/RedFighter.png'},
+      {name: 'BlueFighter', type: 'image', src: '/assets/game-assets/BlueFighter.png'},
+      {name: 'A318', type: 'image', src: '/assets/game-assets/A318.png'}
     ];
     service.preload(files);
     let images: HTMLImageElement[] = [];
@@ -36,7 +36,7 @@ describe('LoaderService', () => {
   it('should preload all audio files', async() => {
     const service: LoaderService = TestBed.get(LoaderService);
     files = [
-      {name: 'Explosion', type: 'audio', src: '/assets/gameObjects/explosion.wav'},
+      {name: 'Explosion', type: 'audio', src: '/assets/game-assets/explosion.wav'},
     ];
     service.preload(files);
     let audioFiles: HTMLAudioElement[] = [];

@@ -5,7 +5,7 @@ import {Battleship} from "../game-objects/Battleship";
 import {Bullet} from "../game-objects/Bullet";
 import {Enemy} from "../game-objects/Enemy";
 
-// TODO: Unit test
+// TODO: Unit test for bullet intersection method
 
 describe('GameLogicService', () => {
   let service: GameLogicService;
