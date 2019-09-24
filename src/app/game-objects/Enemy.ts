@@ -1,7 +1,8 @@
 import {Direction, GameObject} from "./GameObject";
 
 export class Enemy extends GameObject {
-  private readonly movementDistance: number = 6;
+  private readonly movementDistanceLeftRight: number = 6;
+  private readonly movementDistanceDown: number = 10;
 
   /**
    * Instantiates a new enemy
@@ -33,18 +34,18 @@ export class Enemy extends GameObject {
    move(): void {
     switch(this.movementDirection) {
       case Direction.RIGHT:
-        if ((this.xPos + this.movementDistance + this.width) < this.ctx.canvas.width) {
-          this.xPos += this.movementDistance;
+        if ((this.xPos + this.movementDistanceLeftRight + this.width) < this.ctx.canvas.width) {
+          this.xPos += this.movementDistanceLeftRight;
         }
         break;
       case Direction.LEFT:
-        if (this.xPos - this.movementDistance > 0) {
-          this.xPos -= this.movementDistance;
+        if (this.xPos - this.movementDistanceLeftRight > 0) {
+          this.xPos -= this.movementDistanceLeftRight;
         }
         break;
       case Direction.DOWN:
-        if (this.yPos + 10 + this.height < this.ctx.canvas.height) {
-          this.yPos += 10;
+        if (this.yPos + this.movementDistanceDown + this.height < this.ctx.canvas.height) {
+          this.yPos += this.movementDistanceDown;
         }
         break;
     }
@@ -56,22 +57,32 @@ export class Enemy extends GameObject {
    boundaryReached(): boolean {
     switch(this.movementDirection) {
       case Direction.RIGHT:
-        return (this.xPos + this.width + this.movementDistance) >= this.ctx.canvas.width;
+        return (this.xPos + this.width + this.movementDistanceLeftRight) >= this.ctx.canvas.width;
       case Direction.LEFT:
-        return this.xPos - this.movementDistance <= 0;
+        return this.xPos - this.movementDistanceLeftRight <= 0;
       case Direction.DOWN:
-        return this.yPos + this.movementDistance >= this.ctx.canvas.height;
+        return this.yPos + this.movementDistanceDown >= this.ctx.canvas.height;
     }
   }
 
+  /**
+   * @return returns the current movement direction
+   */
   getMovementDirection(): Direction {
     return this.movementDirection;
   }
 
+  /**
+   * Sets the movement direction
+   * @param direction desired direction
+   */
   setMovementDirection(direction: Direction): void {
     this.movementDirection = direction;
   }
 
+  /**
+   * Returns the hit score of the enemy
+   */
   getHitScore(): number {
     return this.hitScore;
   }

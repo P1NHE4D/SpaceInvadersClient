@@ -4,9 +4,9 @@ export class Explosion extends GameObject {
 
   constructor(
     image: HTMLImageElement,
+    ctx: CanvasRenderingContext2D,
     xPos: number,
     yPos: number,
-    ctx: CanvasRenderingContext2D,
     frames: number,
     ticksPerFrame: number
   ) {
