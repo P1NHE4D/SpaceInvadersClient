@@ -1,7 +1,7 @@
 import {Direction, GameObject} from "./GameObject";
 
 export class Bullet extends GameObject {
-  private readonly movementSpeed: number = 2;
+  private readonly _movementSpeed: number = 2;
 
   /**
    * Instantiates a new bullet
@@ -27,15 +27,15 @@ export class Bullet extends GameObject {
   move(direction: Direction, boundaryReached?: () => any): void {
     switch(direction) {
       case Direction.UP:
-        if (this.yPos - this.movementSpeed > 0) {
-          this.yPos -= this.movementSpeed;
+        if (this._yPos - this._movementSpeed > 0) {
+          this._yPos -= this._movementSpeed;
         } else {
           boundaryReached();
         }
         break;
       case Direction.DOWN:
-        if (this.yPos + this.movementSpeed < this.ctx.canvas.height) {
-          this.yPos += this.movementSpeed;
+        if (this._yPos + this._movementSpeed < this._ctx.canvas.height) {
+          this._yPos += this._movementSpeed;
         } else {
           boundaryReached();
         }
@@ -46,18 +46,25 @@ export class Bullet extends GameObject {
   /**
    * Checks if the bullet intersects with a game world object
    * @param xPos x-position of game world object
-   * @param width width of game world object
+   * @param width _width of game world object
    * @param yPos y-position of game world object
-   * @param height height of game world object
+   * @param height _height of game world object
    */
   intersectsWithObject(xPos: number, width: number, yPos: number, height: number) {
     return (
-        (this.xPos <= xPos + width && this.xPos >= xPos) ||
-        (this.xPos + this.width >= xPos && this.xPos + this.width <= xPos + width)
+        (this._xPos <= xPos + width && this._xPos >= xPos) ||
+        (this._xPos + this._width >= xPos && this._xPos + this._width <= xPos + width)
       ) && (
-        (this.yPos <= yPos + height && this.yPos >= yPos) ||
-        (this.yPos + this.height >= yPos && this.yPos + this.height <= yPos + height)
+        (this._yPos <= yPos + height && this._yPos >= yPos) ||
+        (this._yPos + this._height >= yPos && this._yPos + this._height <= yPos + height)
       )
+  }
+
+  /**
+   * @return returns the movement speed of the bullet
+   */
+  get movementSpeed(): number {
+    return this._movementSpeed;
   }
 
 }

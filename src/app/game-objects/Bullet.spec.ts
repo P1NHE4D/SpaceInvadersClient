@@ -19,39 +19,41 @@ describe('Bullet', () => {
   });
 
   it('should move up', () => {
-    let initialY = bullet.getY();
-    let initialX = bullet.getX();
+    let initialY: number = bullet.y
+    let initialX: number = bullet.x
     for (let x = 0; x < 4; ++x) {
       bullet.move(Direction.UP);
     }
-    let newY = bullet.getY();
-    let newX = bullet.getX();
-    expect(newY).toBe(initialY - 4 * 2);
+    let newY: number = bullet.y;
+    let newX: number = bullet.x;
+    let speed: number = bullet.movementSpeed;
+    expect(newY).toBe(initialY - 4 * speed);
     expect(newX).toBe(initialX);
   });
 
   it('should move down', () => {
-    let initialY = bullet.getY();
-    let initialX = bullet.getX();
+    let initialY: number = bullet.y
+    let initialX: number = bullet.x
     for (let x = 0; x < 4; ++x) {
       bullet.move(Direction.DOWN);
     }
-    let newY = bullet.getY();
-    let newX = bullet.getX();
-    expect(newY).toBe(initialY + 4 * 2);
+    let newY: number = bullet.y;
+    let newX: number = bullet.x;
+    let speed: number = bullet.movementSpeed;
+    expect(newY).toBe(initialY + 4 * speed);
     expect(newX).toBe(initialX);
   });
 
   it('should intersect with object', () => {
-    let bsImage = new Image();
+    let bsImage: HTMLImageElement = new Image();
     bsImage.src = '/assets/gameObjects/RedFighter.png';
-    let battleship = new Battleship(bsImage, ctx, 100, 600);
-    let intersection = bullet.intersectsWithObject(battleship.getX(), battleship.getWidth(), battleship.getY(), battleship.getHeight());
+    let battleship: Battleship = new Battleship(bsImage, ctx, 100, 600);
+    let intersection: boolean = bullet.intersectsWithObject(battleship.x, battleship.width, battleship.y, battleship.height);
     expect(intersection).toBeTruthy();
   });
 
   it('should not intersect with object', () => {
-    let intersection = bullet.intersectsWithObject(100, 40, 620, 19);
+    let intersection: boolean = bullet.intersectsWithObject(100, 40, 620, 19);
     expect(intersection).toBeFalsy();
   });
 

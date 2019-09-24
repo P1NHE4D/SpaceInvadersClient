@@ -1,44 +1,44 @@
 export abstract class GameObject {
-  protected width: number;
-  protected height: number;
-  protected frameIndex: number = 0;
-  protected tickCount: number = 0;
+  protected _width: number;
+  protected _height: number;
+  protected _frameIndex: number = 0;
+  protected _tickCount: number = 0;
   /**
    * Instantiates a new game object
-   * @param image image that depicts the game object
-   * @param xPos initial x-position of the game object
-   * @param yPos initial y-position of the game object
-   * @param ctx canvas rendering context
-   * @param frames frames of the image
-   * @param ticksPerFrame refresh rate of the object
+   * @param _image image that depicts the game object
+   * @param _xPos initial x-position of the game object
+   * @param _yPos initial y-position of the game object
+   * @param _ctx canvas rendering context
+   * @param _frames _frames of the image
+   * @param _ticksPerFrame refresh rate of the object
    * */
   protected constructor(
-    private image: HTMLImageElement,
-    protected xPos: number,
-    protected yPos: number,
-    protected ctx: CanvasRenderingContext2D,
-    protected frames: number = 1,
-    protected ticksPerFrame: number = 0
+    private _image: HTMLImageElement,
+    protected _xPos: number,
+    protected _yPos: number,
+    protected _ctx: CanvasRenderingContext2D,
+    protected _frames: number = 1,
+    protected _ticksPerFrame: number = 0
 
   ) {
-    this.width = image.width / frames;
-    this.height = image.height;
+    this._width = _image.width / _frames;
+    this._height = _image.height;
   }
 
   /**
    * Draws the game object on the canvas
    */
   render(): void {
-    this.ctx.drawImage(
-      this.image,
-      this.frameIndex * this.width,
+    this._ctx.drawImage(
+      this._image,
+      this._frameIndex * this._width,
       0,
-      this.width,
-      this.height,
-      this.xPos,
-      this.yPos,
-      this.width,
-      this.height
+      this._width,
+      this._height,
+      this._xPos,
+      this._yPos,
+      this._width,
+      this._height
     )
   }
 
@@ -46,39 +46,39 @@ export abstract class GameObject {
    * Updates the frame of the game object
    */
   update(): void {
-    this.tickCount += 1;
-    if (this.tickCount > this.ticksPerFrame) {
-      this.tickCount = 0;
-      this.frameIndex = (this.frameIndex + 1) % this.frames;
+    this._tickCount += 1;
+    if (this._tickCount > this._ticksPerFrame) {
+      this._tickCount = 0;
+      this._frameIndex = (this._frameIndex + 1) % this._frames;
     }
   }
 
   /**
    * @return Returns x-position of game object
    */
-  getX(): number {
-    return this.xPos;
+  get x(): number {
+    return this._xPos;
   }
 
   /**
    * @return Returns y-position of game object
    */
-  getY(): number {
-    return this.yPos;
+  get y(): number {
+    return this._yPos;
   }
 
   /**
-   * @return Returns width of game object
+   * @return Returns _width of game object
    */
-  getWidth(): number {
-    return this.width;
+  get width(): number {
+    return this._width;
   }
 
   /**
-   * @return Returns height of game object
+   * @return Returns _height of game object
    */
-  getHeight(): number {
-    return this.height;
+  get height(): number {
+    return this._height;
   }
 
 }

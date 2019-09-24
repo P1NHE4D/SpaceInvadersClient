@@ -2,12 +2,12 @@
 <canvas #canvas ></canvas>
 <div class="score-bar">
   <div class="flex-container-left left">
-    <p class="red" *ngIf="this.gameLogic.getPlayer('playerOne')">P1 Score: {{this.gameLogic.getPlayer('playerOne').getScore()}}</p>
-    <p class="red" *ngIf="this.gameLogic.getPlayer('playerOne')">P1 Lives: {{this.gameLogic.getPlayer('playerOne').getLives()}}</p>
+    <p class="red" *ngIf="this.gameLogic.getPlayer('playerOne')">P1 Score: {{this.gameLogic.getPlayer('playerOne').score}}</p>
+    <p class="red" *ngIf="this.gameLogic.getPlayer('playerOne')">P1 Lives: {{this.gameLogic.getPlayer('playerOne').lives}}</p>
   </div>
   <div class="flex-container-left right">
-    <p class="blue" *ngIf="this.gameLogic.getPlayer('playerTwo')">P2 Score: {{this.gameLogic.getPlayer('playerTwo').getScore()}}</p>
-    <p class="blue" *ngIf="this.gameLogic.getPlayer('playerTwo')">P2 Lives: {{this.gameLogic.getPlayer('playerTwo').getLives()}}</p>
+    <p class="blue" *ngIf="this.gameLogic.getPlayer('playerTwo')">P2 Score: {{this.gameLogic.getPlayer('playerTwo').score}}</p>
+    <p class="blue" *ngIf="this.gameLogic.getPlayer('playerTwo')">P2 Lives: {{this.gameLogic.getPlayer('playerTwo').lives}}</p>
   </div>
 </div>
 
@@ -44,8 +44,8 @@
 <div class="modal" [ngStyle]="{'display': displayGameOverModal}">
     <div class="flex-container-center">
       <h2 class="main-title">Game Over</h2>
-      <h3 *ngIf="this.gameLogic.getPlayer('playerOne')" class="red mt-20">Player 1 Score: {{this.gameLogic.getPlayer('playerOne').getScore()}}</h3>
-      <h3 *ngIf="this.gameLogic.getPlayer('playerTwo')" class="blue mb-20">Player 2 Score: {{this.gameLogic.getPlayer('playerTwo').getScore()}}</h3>
+      <h3 *ngIf="this.gameLogic.getPlayer('playerOne')" class="red mt-20">Player 1 Score: {{this.gameLogic.getPlayer('playerOne').score}}</h3>
+      <h3 *ngIf="this.gameLogic.getPlayer('playerTwo')" class="blue mb-20">Player 2 Score: {{this.gameLogic.getPlayer('playerTwo').score}}</h3>
       <form *ngIf="!multiplayer" [formGroup]="spHighScoreForm" (ngSubmit)="submitHighScore()">
         <input formControlName="playerOneName" type="text" class="custom-input mt-20" placeholder="Player 1 Name" required>
         <button class="btn btn-main-md mt-20" type="submit" [disabled]="!spHighScoreForm.valid">Submit</button>

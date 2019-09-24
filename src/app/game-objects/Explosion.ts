@@ -18,7 +18,7 @@ export class Explosion extends GameObject {
    * @param animationFinished callback function executed as soon as animation is finished
    */
   update(animationFinished?: () => any): void {
-    if(animationFinished !== null && this.frameIndex === this.frames - 1) {
+    if(animationFinished !== null && this._frameIndex === this._frames - 1) {
       animationFinished();
     } else {
       super.update();

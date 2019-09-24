@@ -28,33 +28,33 @@ describe('Enemy', () => {
   });
 
   it('should change the movement direction', () => {
-    enemy.setMovementDirection(Direction.RIGHT);
-    let direction: Direction = enemy.getMovementDirection();
+    enemy.movementDirection = Direction.RIGHT;
+    let direction: Direction = enemy.movementDirection;
     expect(direction).toBe(Direction.RIGHT);
-    enemy.setMovementDirection(Direction.LEFT);
-    direction = enemy.getMovementDirection();
+    enemy.movementDirection = Direction.LEFT;
+    direction = enemy.movementDirection;
     expect(direction).toBe(Direction.LEFT);
-    enemy.setMovementDirection(Direction.DOWN);
-    direction = enemy.getMovementDirection();
+    enemy.movementDirection = Direction.DOWN;
+    direction = enemy.movementDirection
     expect(direction).toBe(Direction.DOWN);
   });
 
   it('should move the enemy to the right', () => {
-    enemy.setMovementDirection(Direction.RIGHT);
+    enemy.movementDirection = Direction.RIGHT;
     enemy.move();
-    let x: number = enemy.getX();
-    let y: number = enemy.getY();
+    let x: number = enemy.x;
+    let y: number = enemy.y;
     expect(x).toBe(initialX + movementDistance);
     expect(y).toBe(initialY);
   });
 
   it('should not move the enemy beyond the right canvas border', () => {
-    enemy.setMovementDirection(Direction.RIGHT);
+    enemy.movementDirection = Direction.RIGHT;
     for (let i = initialX; i < ctx.canvas.width; i += movementDistance) {
       enemy.move();
     }
-    let x: number = enemy.getX();
-    let y: number = enemy.getY();
+    let x: number = enemy.x;
+    let y: number = enemy.y;
     let boundaryReached: boolean = enemy.boundaryReached();
     expect(x).toBeLessThan(ctx.canvas.width);
     expect(y).toBe(initialY);
@@ -62,21 +62,21 @@ describe('Enemy', () => {
   });
 
   it('should move the enemy to the left', () => {
-    enemy.setMovementDirection(Direction.LEFT);
+    enemy.movementDirection = Direction.LEFT;
     enemy.move();
-    let x: number = enemy.getX();
-    let y: number = enemy.getY();
+    let x: number = enemy.x;
+    let y: number = enemy.y;
     expect(x).toBe(initialX - movementDistance);
     expect(y).toBe(initialY);
   });
 
   it('should not move the enemy beyond the left canvas border', () => {
-    enemy.setMovementDirection(Direction.LEFT);
+    enemy.movementDirection = Direction.LEFT;
     for (let i = initialX; i > 0; i -= movementDistance) {
       enemy.move();
     }
-    let x: number = enemy.getX();
-    let y: number = enemy.getY();
+    let x: number = enemy.x;
+    let y: number = enemy.y;
     let boundaryReached: boolean = enemy.boundaryReached();
     expect(x).toBeGreaterThan(0);
     expect(y).toBe(initialY);
@@ -84,21 +84,21 @@ describe('Enemy', () => {
   });
 
   it('should move the enemy down', () => {
-    enemy.setMovementDirection(Direction.DOWN);
+    enemy.movementDirection = Direction.DOWN;
     enemy.move();
-    let x: number = enemy.getX();
-    let y: number = enemy.getY();
+    let x: number = enemy.x;
+    let y: number = enemy.y;
     expect(x).toBe(initialX);
     expect(y).toBe(initialY + movementDistanceDown);
   });
 
   it('should not move the enemy beyond the lower canvas border', () => {
-    enemy.setMovementDirection(Direction.DOWN);
+    enemy.movementDirection = Direction.DOWN;
     for (let i = initialY; i < ctx.canvas.height; i += movementDistanceDown) {
       enemy.move();
     }
-    let x: number = enemy.getX();
-    let y: number = enemy.getY();
+    let x: number = enemy.x;
+    let y: number = enemy.y;
     let boundaryReached: boolean = enemy.boundaryReached();
     expect(x).toBe(initialX);
     expect(y).toBeLessThan(ctx.canvas.height);
@@ -106,7 +106,7 @@ describe('Enemy', () => {
   });
 
   it('should return the hit score', () => {
-    let score: number = enemy.getHitScore();
+    let score: number = enemy.hitScore;
     expect(score).toBe(hitScore);
   });
 

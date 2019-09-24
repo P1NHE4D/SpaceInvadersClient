@@ -1,9 +1,9 @@
 import {Direction, GameObject} from "./GameObject";
 
 export class Battleship extends GameObject {
-  private movementSpeed: number = 10;
-  private score: number = 0;
-  private lives: number = 3;
+  private _movementSpeed: number = 10;
+  private _score: number = 0;
+  private _lives: number = 3;
 
   /**
    * Instantiates a new battleship
@@ -11,7 +11,7 @@ export class Battleship extends GameObject {
    * @param xPos initial y-position of the battleship
    * @param yPos initial x-position of the battleship
    * @param ctx canvas rendering context
-   * @param frames number of frames per image
+   * @param frames number of _frames per image
    * @param ticksPerFrame ticks between switching from one frame to the next
    */
   constructor(
@@ -23,8 +23,8 @@ export class Battleship extends GameObject {
     ticksPerFrame?: number
   ) {
     super(image, xPos, yPos, ctx, frames, ticksPerFrame);
-    this.xPos -= (this.width / 2);  // centers the ship with respect to its width
-    this.yPos -= this.height;
+    this._xPos -= (this._width / 2);  // centers the ship with respect to its _width
+    this._yPos -= this._height;
   }
 
   /**
@@ -34,47 +34,51 @@ export class Battleship extends GameObject {
   move(direction: Direction): void {
     switch(direction) {
       case Direction.LEFT:
-        if (this.xPos - this.movementSpeed > 0) {
-          this.xPos -= this.movementSpeed;
+        if (this._xPos - this._movementSpeed > 0) {
+          this._xPos -= this._movementSpeed;
         }
         break;
       case Direction.RIGHT:
-        if (this.xPos + this.movementSpeed + this.width < this.ctx.canvas.width) {
-          this.xPos += this.movementSpeed;
+        if (this._xPos + this._movementSpeed + this._width < this._ctx.canvas.width) {
+          this._xPos += this._movementSpeed;
         }
         break;
     }
   }
 
-  getScore(): number {
-    return this.score;
+  get score(): number {
+    return this._score;
   }
 
   addToScore(points: number) {
-    this.score += points;
+    this._score += points;
   }
 
   subtractFromScore(points: number) {
-    if (this.score  - points >= 0) {
-      this.score -= points;
+    if (this._score  - points >= 0) {
+      this._score -= points;
     } else {
-      this.score = 0;
+      this._score = 0;
     }
 
   }
 
-  getLives(): number {
-    return this.lives;
+  get lives(): number {
+    return this._lives;
   }
 
   removeLife(): void {
-    if (this.lives > 0) {
-      --this.lives;
+    if (this._lives > 0) {
+      --this._lives;
     }
   }
 
   addLife(): void {
-    ++this.lives;
+    ++this._lives;
+  }
+
+  get movementSpeed(): number {
+    return this._movementSpeed;
   }
 
 }

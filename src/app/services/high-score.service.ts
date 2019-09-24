@@ -9,8 +9,8 @@ import {SpHighScore} from "../models/sp-high-score";
   providedIn: 'root'
 })
 export class HighScoreService {
-  private readonly baseUrl: string = 'http://localhost:5000/api';
-  private readonly httpOptions = {
+  private readonly BASEURL: string = 'http://localhost:5000/api';
+  private readonly HTTPOPTIONS = {
     headers: new HttpHeaders({'ContentType': 'application/json'})
   };
 
@@ -23,13 +23,13 @@ export class HighScoreService {
    * @param highScoreEntry single or multi player high score
    */
   addSpHighScore<T extends SpHighScore>(highScoreEntry: T): Observable<T> {
-    return this.http.post<T>(`${this.baseUrl}/sp-high-score`, highScoreEntry, this.httpOptions).pipe(
+    return this.http.post<T>(`${this.BASEURL}/sp-high-score`, highScoreEntry, this.HTTPOPTIONS).pipe(
       catchError(this.handleError<T>())
     );
   }
 
   addMpHighScore<T extends MpHighScore>(highScoreEntry: T): Observable<T> {
-    return this.http.post<T>(`${this.baseUrl}/mp-high-score`, highScoreEntry, this.httpOptions).pipe(
+    return this.http.post<T>(`${this.BASEURL}/mp-high-score`, highScoreEntry, this.HTTPOPTIONS).pipe(
       catchError(this.handleError<T>())
     );
   }
@@ -38,7 +38,7 @@ export class HighScoreService {
    * Retrieves all single player high scores from server
    */
   getSpHighScores<T extends SpHighScore[]>(): Observable<T> {
-    return this.http.get<T>(`${this.baseUrl}/sp-high-score`).pipe(
+    return this.http.get<T>(`${this.BASEURL}/sp-high-score`).pipe(
       catchError(this.handleError<T>())
     );
   }
@@ -47,7 +47,7 @@ export class HighScoreService {
    * Retrieves all multi player high scores from server
    */
   getMpHighScores<T extends MpHighScore[]>(): Observable<T> {
-    return this.http.get<T>(`${this.baseUrl}/mp-high-score`).pipe(
+    return this.http.get<T>(`${this.BASEURL}/mp-high-score`).pipe(
       catchError(this.handleError<T>())
     );
   }

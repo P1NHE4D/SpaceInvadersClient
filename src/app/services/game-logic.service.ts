@@ -7,12 +7,12 @@ import {Explosion} from "../game-objects/Explosion";
 
 @Injectable()
 export class GameLogicService {
-  private players: Map<string, Battleship> = new Map<string, Battleship>();
-  private playerBullets: Map<string, Bullet[]> = new Map<string, Bullet[]>();
-  private enemies: Enemy[] = [];
-  private enemyBullets: Bullet[] = [];
-  private explosions: Explosion[] = [];
-  private gameOver: boolean = false;
+  private _players: Map<string, Battleship> = new Map<string, Battleship>();
+  private _playerBullets: Map<string, Bullet[]> = new Map<string, Bullet[]>();
+  private _enemies: Enemy[] = [];
+  private _enemyBullets: Bullet[] = [];
+  private _explosions: Explosion[] = [];
+  private _gameOver: boolean = false;
 
   constructor(
   ) {}
@@ -24,8 +24,8 @@ export class GameLogicService {
    * @param ctx canvas rendering context
    * @param x initial x-position of the battleship
    * @param y initial y-position of the battleship
-   * @param frames frames of image used to depict player
-   * @param ticksPerFrame ticks between two frames
+   * @param frames _frames of image used to depict player
+   * @param ticksPerFrame ticks between two _frames
    */
   spawnPlayer(
     playerName: string,
@@ -37,8 +37,8 @@ export class GameLogicService {
     ticksPerFrame?: number
   ): void {
     let player = new Battleship(img, ctx, x, y, frames, ticksPerFrame);
-    this.players.set(playerName, player);
-    this.playerBullets.set(playerName, []);
+    this._players.set(playerName, player);
+    this._playerBullets.set(playerName, []);
   }
 
   /**
@@ -46,7 +46,7 @@ export class GameLogicService {
    * @param playerName of player
    */
   movePlayerLeft(playerName: string): void {
-    let player = this.players.get(playerName);
+    let player = this._players.get(playerName);
     if (player) {
       player.move(Direction.LEFT);
     }
@@ -57,7 +57,7 @@ export class GameLogicService {
    * @param playerName of player
    */
   movePlayerRight(playerName: string): void {
-    let player = this.players.get(playerName);
+    let player = this._players.get(playerName);
     if (player) {
       player.move(Direction.RIGHT);
     }
@@ -70,10 +70,10 @@ export class GameLogicService {
    * @param ctx canvas rendering context
    */
   fireBullet(playerName: string, img: HTMLImageElement, ctx: CanvasRenderingContext2D): void {
-    let player = this.players.get(playerName);
+    let player = this._players.get(playerName);
     if (player) {
-      let bullet = new Bullet(img, ctx, player.getX() + player.getWidth() / 2, player.getY());
-      this.playerBullets.get(playerName).push(bullet);
+      let bullet = new Bullet(img, ctx, player.x + player.width / 2, player.y);
+      this._playerBullets.get(playerName).push(bullet);
     }
   }
 
@@ -83,10 +83,10 @@ export class GameLogicService {
    * @param ctx canvas rendering context
    */
   fireEnemyBullet(image: HTMLImageElement, ctx: CanvasRenderingContext2D): void {
-    let randomIndex = Math.floor(Math.random() * this.enemies.length);
-    let randomEnemy = this.enemies[randomIndex];
-    let bullet = new Bullet(image, ctx, randomEnemy.getX() + randomEnemy.getWidth() / 2, randomEnemy.getY());
-    this.enemyBullets.push(bullet);
+    let randomIndex = Math.floor(Math.random() * this._enemies.length);
+    let randomEnemy = this._enemies[randomIndex];
+    let bullet = new Bullet(image, ctx, randomEnemy.x + randomEnemy.width / 2, randomEnemy.y);
+    this._enemyBullets.push(bullet);
   }
 
   /**
@@ -94,20 +94,20 @@ export class GameLogicService {
    * @param img image used to depict the enemy
    * @param ctx canvas rendering context
    * @param hitScore rewarded score for hitting the enemy
-   * @param frames number of image frames
-   * @param ticksPerFrame ticks in between two frames
+   * @param frames number of image _frames
+   * @param ticksPerFrame ticks in between two _frames
    *
    */
   spawnEnemyRow(img: HTMLImageElement, ctx: CanvasRenderingContext2D, hitScore: number, frames?: number, ticksPerFrame?: number): void {
     let enemiesPerRow = (ctx.canvas.width - 2 * img.width) / (img.width + 10);
     let yPos =img.height;
-    if (this.enemies.length > 0) {
-      yPos = this.enemies[this.enemies.length - 1].getY() + img.height + 10;
+    if (this._enemies.length > 0) {
+      yPos = this._enemies[this._enemies.length - 1].y + img.height + 10;
     }
     for (let i = 0; i < enemiesPerRow; ++i) {
       let xPos: number = (i * (img.width + 10));
       let enemy: Enemy = new Enemy(img, ctx, xPos, yPos, hitScore, Direction.RIGHT, frames, ticksPerFrame);
-      this.enemies.push(enemy);
+      this._enemies.push(enemy);
     }
   }
 
@@ -115,7 +115,7 @@ export class GameLogicService {
    * Moves each player bullet up
    */
   movePlayerBullets(): void {
-    for (let bullets of this.playerBullets.values()) {
+    for (let bullets of this._playerBullets.values()) {
       for (let bullet of bullets) {
         bullet.move(Direction.UP, () => {
           let index = bullets.indexOf(bullet);
@@ -129,10 +129,10 @@ export class GameLogicService {
    * Moves each bullet of the enemy
    */
   moveEnemyBullets(): void {
-    for (let bullet of this.enemyBullets) {
+    for (let bullet of this._enemyBullets) {
       bullet.move(Direction.DOWN, () => {
-        let index = this.enemyBullets.indexOf(bullet);
-        this.enemyBullets.splice(index, 1);
+        let index = this._enemyBullets.indexOf(bullet);
+        this._enemyBullets.splice(index, 1);
       });
     }
   }
@@ -141,27 +141,27 @@ export class GameLogicService {
    * Checks if a player bullet intersects with an enemy
    * @param image image used for explosion if bullet hit enemy
    * @param ctx canvas rendering context
-   * @param frames frames of the image
-   * @param ticksPerFrame ticks between two frames of the image
+   * @param frames _frames of the image
+   * @param ticksPerFrame ticks between two _frames of the image
    */
   checkForPlayerBulletIntersections(image: HTMLImageElement, ctx: CanvasRenderingContext2D, frames: number, ticksPerFrame: number) {
-    for (let enemy of this.enemies) {
-      for (let playerName of this.playerBullets.keys()) {
-        let bullets: Bullet[] = this.playerBullets.get(playerName);
-        let playerObject: Battleship = this.players.get(playerName);
+    for (let enemy of this._enemies) {
+      for (let playerName of this._playerBullets.keys()) {
+        let bullets: Bullet[] = this._playerBullets.get(playerName);
+        let playerObject: Battleship = this._players.get(playerName);
         for (let bullet of bullets) {
-          if (bullet.intersectsWithObject(enemy.getX(), enemy.getWidth(), enemy.getY(), enemy.getHeight())) {
+          if (bullet.intersectsWithObject(enemy.x, enemy.width, enemy.y, enemy.height)) {
             let index = bullets.indexOf(bullet);
             bullets.splice(index, 1);
-            if ((playerObject.getScore() % 1000) + enemy.getHitScore() >= 1000) {
+            if ((playerObject.score % 1000) + enemy.hitScore >= 1000) {
               playerObject.addLife();
             }
-            playerObject.addToScore(enemy.getHitScore());
-            index = this.enemies.indexOf(enemy);
+            playerObject.addToScore(enemy.hitScore);
+            index = this._enemies.indexOf(enemy);
             // TODO: Add explosion sound
-            let explosion = new Explosion(image, enemy.getX(), enemy.getY(), ctx, frames, ticksPerFrame);
-            this.explosions.push(explosion);
-            this.enemies.splice(index, 1);
+            let explosion = new Explosion(image, ctx, enemy.x, enemy.y, frames, ticksPerFrame);
+            this._explosions.push(explosion);
+            this._enemies.splice(index, 1);
           }
         }
       }
@@ -172,28 +172,28 @@ export class GameLogicService {
    * Checks if an enemy bullet intersects with a player object
    * @param image image used for explosion if bullet hit player
    * @param ctx canvas rendering context
-   * @param frames frames of the image
-   * @param ticksPerFrame ticks between two frames of the image
+   * @param frames _frames of the image
+   * @param ticksPerFrame ticks between two _frames of the image
    */
   checkForEnemyBulletIntersections(image: HTMLImageElement, ctx: CanvasRenderingContext2D, frames: number, ticksPerFrame: number) {
-    for (let player of this.players.values()) {
-      for (let bullet of this.enemyBullets) {
-        if (bullet.intersectsWithObject(player.getX(), player.getWidth(), player.getY(), player.getHeight())) {
-          let index = this.enemyBullets.indexOf(bullet);
-          this.enemyBullets.splice(index, 1);
-          let x = player.getX();
-          let y = player.getY();
+    for (let player of this._players.values()) {
+      for (let bullet of this._enemyBullets) {
+        if (bullet.intersectsWithObject(player.x, player.width, player.y, player.height)) {
+          let index = this._enemyBullets.indexOf(bullet);
+          this._enemyBullets.splice(index, 1);
+          let x = player.x;
+          let y = player.y;
           if (x + (image.width / 32) > ctx.canvas.width) {
             x -= (x + (image.width / 32)) % ctx.canvas.width;
           }
           if (y + image.height > ctx.canvas.height) {
             y-= (y + image.height) % ctx.canvas.height;
           }
-          let explosion = new Explosion(image, x, y, ctx, frames, ticksPerFrame);
-          this.explosions.push(explosion);
+          let explosion = new Explosion(image, ctx, x, y, frames, ticksPerFrame);
+          this._explosions.push(explosion);
           player.removeLife();
-          if (player.getLives() === 0) {
-            this.gameOver = true;
+          if (player.lives === 0) {
+            this._gameOver = true;
           }
           //TODO: Add explosion sound and animation
           //TODO: if player is hit, remove player from game for a period of time and respawn
@@ -210,21 +210,21 @@ export class GameLogicService {
     //TODO: Game over if enemies reached the lower boundary of the game
     let movementDirection: Direction;
     let boundaryReached: boolean = false;
-    for (let enemy of this.enemies) {
+    for (let enemy of this._enemies) {
       if (enemy.boundaryReached()) {
         boundaryReached = true;
       }
     }
 
-    for (let enemy of this.enemies) {
-      movementDirection = enemy.getMovementDirection();
+    for (let enemy of this._enemies) {
+      movementDirection = enemy.movementDirection;
       if (boundaryReached) {
-        enemy.setMovementDirection(Direction.DOWN);
+        enemy.movementDirection = Direction.DOWN;
         enemy.move();
         if (movementDirection === Direction.RIGHT) {
-          enemy.setMovementDirection(Direction.LEFT);
+          enemy.movementDirection = Direction.LEFT;
         } else {
-          enemy.setMovementDirection(Direction.RIGHT);
+          enemy.movementDirection = Direction.RIGHT;
         }
       } else {
         enemy.move();
@@ -236,29 +236,29 @@ export class GameLogicService {
    * Renders all game objects
    */
   renderGameObjects(): void {
-    for (let player of this.players.values()) {
+    for (let player of this._players.values()) {
       player.render();
       player.update();
     }
-    for (let enemy of this.enemies) {
+    for (let enemy of this._enemies) {
       enemy.render();
       enemy.update();
     }
-    for (let bullets of this.playerBullets.values()) {
+    for (let bullets of this._playerBullets.values()) {
       for (let bullet of bullets) {
         bullet.render();
         bullet.update();
       }
     }
-    for (let bullet of this.enemyBullets) {
+    for (let bullet of this._enemyBullets) {
       bullet.render();
       bullet.update();
     }
-    for (let explosion of this.explosions) {
+    for (let explosion of this._explosions) {
       explosion.render();
       explosion.update(() => {
-        let index = this.explosions.indexOf(explosion);
-        this.explosions.splice(index, 1);
+        let index = this._explosions.indexOf(explosion);
+        this._explosions.splice(index, 1);
       });
     }
   }
@@ -267,14 +267,14 @@ export class GameLogicService {
    * @return game over
    */
   gameIsOver(): boolean {
-    return this.gameOver;
+    return this._gameOver;
   }
 
   /**
    * @return number of enemies remaining
    */
   enemiesRemaining(): number {
-    return this.enemies.length;
+    return this._enemies.length;
   }
 
   /**
@@ -282,7 +282,7 @@ export class GameLogicService {
    * @return Returns the score of the player
    */
   getPlayerScore(playerName: string): number {
-    return this.players.get(playerName).getScore();
+    return this._players.get(playerName).score;
   }
 
   /**
@@ -290,11 +290,51 @@ export class GameLogicService {
    * @return returns lives of the player
    */
   getPlayerLives(playerName: string): number {
-    return this.players.get(playerName).getLives();
+    return this._players.get(playerName).lives;
   }
 
+  /**
+   * Gets a player object by name
+   * @param playerName name of the player
+   * @return returns the game object of the player
+   */
   getPlayer(playerName: string): Battleship {
-    return this.players.get(playerName);
+    return this._players.get(playerName);
+  }
+
+  /**
+   * @return returns a map containing the name and corresponding game object of the player
+   */
+  get players(): Map<string, Battleship> {
+    return this._players;
+  }
+
+  /**
+   * @return returns a map containing the name and the corresponding array of bullets of the player
+   */
+  get playerBullets(): Map<string, Bullet[]> {
+    return this._playerBullets;
+  }
+
+  /**
+   * @return returns all enemies currently in the game
+   */
+  get enemies(): Enemy[] {
+    return this._enemies;
+  }
+
+  /**
+   * @return returns all enemy bullets currently in game
+   */
+  get enemyBullets(): Bullet[] {
+    return this._enemyBullets;
+  }
+
+  /**
+   * @return returns all explosions currently in game
+   */
+  get explosions(): Explosion[] {
+    return this._explosions;
   }
 
 }

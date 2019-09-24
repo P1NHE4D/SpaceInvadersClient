@@ -18,67 +18,67 @@ describe('Battleship', () => {
   });
 
   it('should adjust the x and y position according to the image dimensions', () => {
-    let x = battleship.getX();
-    let y = battleship.getY();
+    let x: number = battleship.x;
+    let y: number = battleship.y;
     expect(x).toBe(100 - (image.width / 2));
     expect(y).toBe(100 - image.height);
   });
 
   it('should move the battleship to the left', () => {
     battleship.move(Direction.LEFT);
-    let x = battleship.getX();
+    let x: number = battleship.x;
     expect(x).toBe(100 - 10);
   });
 
   it('should move the battleship to the right', () => {
     battleship.move(Direction.RIGHT);
-    let x = battleship.getX();
+    let x: number = battleship.x;
     expect(x).toBe(100 + 10);
   });
 
   it('should increase the score', () => {
-    let initialScore = battleship.getScore();
+    let initialScore = battleship.score;
     battleship.addToScore(40);
-    let score = battleship.getScore();
+    let score = battleship.score;
     expect(score).toBe(initialScore + 40);
   });
 
   it('should decrease the score', () => {
-    let initialScore = battleship.getScore();
+    let initialScore = battleship.score;
     battleship.addToScore(40);
     battleship.subtractFromScore(20);
-    let score = battleship.getScore();
+    let score = battleship.score;
     expect(score).toBe(initialScore + 20);
   });
 
   it('should not have a negative score', () => {
-    let initialScore = battleship.getScore();
+    let initialScore = battleship.score;
     battleship.subtractFromScore(initialScore + 20);
-    let score = battleship.getScore();
+    let score = battleship.score;
     expect(score).toBe(0);
   });
 
   it('should add a life', () => {
-    let initialNrOfLives = battleship.getLives();
+    let initialNrOfLives = battleship.lives;
     battleship.addLife();
-    let noOfLives = battleship.getLives();
+    let noOfLives = battleship.lives;
     expect(noOfLives).toBe(initialNrOfLives + 1);
   });
 
   it('should remove a life', () => {
-    let initialNrOfLives = battleship.getLives();
+    let initialNrOfLives = battleship.lives;
     battleship.removeLife();
-    let noOfLives = battleship.getLives();
+    let noOfLives = battleship.lives;
     expect(noOfLives).toBe(initialNrOfLives - 1);
   });
 
   it('should not have negative lives', () => {
-    let initialNrOfLives = battleship.getLives();
+    let initialNrOfLives = battleship.lives;
     for (let x = 0; x < initialNrOfLives; ++x) {
       battleship.removeLife();
     }
     battleship.removeLife();
-    let noOfLives = battleship.getLives();
+    let noOfLives = battleship.lives;
     expect(noOfLives).toBe(0);
   });
 
