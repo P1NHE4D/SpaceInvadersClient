@@ -1,4 +1,4 @@
-<h3 *ngIf="shipsSelected" class="flex-container-center">Level: {{level}}</h3>
+<h3 *ngIf="shipsSelected" class="flex-container-center">Level: {{this.gameLogic.level}}</h3>
 <canvas #canvas ></canvas>
 <div class="score-bar">
   <div class="flex-container-left left">

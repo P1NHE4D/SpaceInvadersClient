@@ -1,6 +1,6 @@
 import {Component, ElementRef, HostListener, Input, OnInit, ViewChild} from '@angular/core';
 import {LoaderService} from "../../services/loader.service";
-import {GameLogicService} from "../../services/game-logic.service";
+import {EnemyMetaData, GameLogicService} from "../../services/game-logic.service";
 import {Explosion} from "../../game-objects/Explosion";
 import {Location} from "@angular/common";
 import {HighScoreService} from "../../services/high-score.service";
@@ -32,17 +32,17 @@ export class GameComponent implements OnInit {
   private playerTwoSelectedBattleship: HTMLImageElement;
   private shipsSelected: boolean = false;
 
-  private numbOfEnemyRows: number = 4;
-  private ticksBetweenMoves: number = 20;
-  private movementTicksCount: number = 0;
-  private ticksBetweenShots: number = 90;
-  private shotTicksCount: number = 0;
   private gameLoaded: boolean = false;
   private gameSetup: boolean = false;
-  private level: number = 1;
+  private enemyMetaData: EnemyMetaData[] = [];
+  private fireCoolDown: number = 25;
+  private cooldownCountPlayerOne: number = 0;
+  private cooldownCountPlayerTwo: number = 0;
 
   private spHighScoreForm: FormGroup;
   private mpHighScoreForm: FormGroup;
+
+  keys: Map<string, boolean> = new Map<string, boolean>();
 
 
   constructor(
@@ -74,41 +74,24 @@ export class GameComponent implements OnInit {
       );
       this.playerOneSelectedBattleship = this.loader.getImage('RedFighter');
       this.playerTwoSelectedBattleship = this.loader.getImage('RedFighter');
+      this.enemyMetaData = [
+        {image: this.loader.getImage("Android"), hitScore: 10, frames: 2, ticksPerFrame: 30},
+        {image: this.loader.getImage("Squid"), hitScore: 20, frames: 2, ticksPerFrame: 30},
+        {image: this.loader.getImage("Death"), hitScore: 30, frames: 2, ticksPerFrame: 30}
+      ];
       this.gameLoaded = true;
     });
     this.loadGameResources();
   }
 
-  // TODO: Improve key handling to improve overall gameplay experience and smoothness
-  // TODO: when both player hold down their movement keys, no player moves
   @HostListener('document:keydown', ['$event'])
-  handleKeyboardEvents(event: KeyboardEvent): void {
-    if (this.gameLoaded && this.gameSetup) {
-      switch (event.key) {
-        case("ArrowUp"):
-          this.gameLogic.fireBullet("playerOne", this.loader.getImage("PlayerOneBullet"), this.ctx);
-          break;
-        case("ArrowLeft"):
-          this.gameLogic.movePlayerLeft("playerOne");
-          break;
-        case("ArrowRight"):
-          this.gameLogic.movePlayerRight("playerOne");
-          break;
-      }
-      if (this.multiplayer) {
-        switch(event.key) {
-          case("w"):
-            this.gameLogic.fireBullet("playerTwo", this.loader.getImage("PlayerTwoBullet"), this.ctx);
-            break;
-          case("a"):
-            this.gameLogic.movePlayerLeft("playerTwo");
-            break;
-          case("d"):
-            this.gameLogic.movePlayerRight("playerTwo");
-            break;
-        }
-      }
-    }
+  handleKeyDown(event: KeyboardEvent): void {
+    this.keys.set(event.key, true);
+  }
+
+  @HostListener('document:keyup', ['$event'])
+  handleKeyUp(event: KeyboardEvent): void {
+    this.keys.set(event.key, false);
   }
 
   // Loads all assets used in the game
@@ -142,77 +125,69 @@ export class GameComponent implements OnInit {
       this.gameLogic.spawnPlayer("playerTwo", playerImage, this.ctx, x, y);
     }
 
-    this.spawnEnemies();
+    this.gameLogic.spawnEnemies(this.enemyMetaData, this.ctx);
     this.gameSetup = true;
   }
 
   private gameLoop = () => {
     //TODO: spawn special enemies, e.g. ISS, UFO, nyan-nyan cat
     //TODO: add background music
-    if (this.gameLogic.gameIsOver()) {
+
+    // Check for game over
+    if (this.gameLogic.gameOver) {
       this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
       this.displayGameOverModal = 'block';
       return;
     }
+
+    // Handle player input
+    if (this.cooldownCountPlayerOne < this.fireCoolDown) {
+      ++this.cooldownCountPlayerOne;
+    }
+    if(this.keys.get("ArrowLeft") === true) {
+      this.gameLogic.movePlayerLeft("playerOne");
+    } else if (this.keys.get("ArrowRight") === true){
+      this.gameLogic.movePlayerRight("playerOne");
+    }
+    if(this.keys.get("ArrowUp") === true && this.cooldownCountPlayerOne === this.fireCoolDown) {
+      this.cooldownCountPlayerOne = 0;
+      this.gameLogic.fireBullet("playerOne", this.loader.getImage("PlayerOneBullet"), this.ctx);
+    }
+
+    if (this.multiplayer) {
+      if (this.cooldownCountPlayerTwo < this.fireCoolDown) {
+        ++this.cooldownCountPlayerTwo;
+      }
+      if(this.keys.get("a") === true) {
+        this.gameLogic.movePlayerLeft("playerTwo");
+      } else if (this.keys.get("d") === true) {
+        this.gameLogic.movePlayerRight("playerTwo");
+      }
+      if(this.keys.get("w") === true && this.cooldownCountPlayerTwo === this.fireCoolDown) {
+        this.cooldownCountPlayerTwo = 0;
+        this.gameLogic.fireBullet("playerTwo", this.loader.getImage("PlayerTwoBullet"), this.ctx);
+      }
+    }
+
+    // handle game objects
     this.gameLogic.checkForPlayerBulletIntersections(this.loader.getImage("Explosion"), this.ctx, 32, 1);
     this.gameLogic.checkForEnemyBulletIntersections(this.loader.getImage("BigExplosion"), this.ctx, 32, 1);
-    if (this.gameLogic.enemiesRemaining() === 0) {
-      ++this.level;
-      this.increaseDifficulty();
-      this.spawnEnemies();
+    if (this.gameLogic.enemies.length === 0) {
+      this.gameLogic.increaseLevel();
+      this.gameLogic.increaseDifficulty();
+      this.gameLogic.spawnEnemies(this.enemyMetaData, this.ctx);
     }
     this.gameLogic.movePlayerBullets();
     this.gameLogic.moveEnemyBullets();
-    if ((++this.movementTicksCount) === this.ticksBetweenMoves) {
-      this.movementTicksCount = 0;
-      this.gameLogic.moveEnemies();
-    }
-    if ((++this.shotTicksCount) === this.ticksBetweenShots) {
-      this.shotTicksCount = 0;
-      this.gameLogic.fireEnemyBullet(this.loader.getImage("EnemyBullet"), this.ctx);
-    }
+    this.gameLogic.moveEnemies();
+    this.gameLogic.fireEnemyBullet(this.loader.getImage("EnemyBullet"), this.ctx);
+
+    // redraw all objects
     requestAnimationFrame(this.gameLoop);
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     this.gameLogic.renderGameObjects();
   };
 
-  // TODO: Move method to game logic
-  // Spawns rows of enemies
-  private spawnEnemies(): void {
-    for (let j = 0; j < this.numbOfEnemyRows; ++j) {
-      let img: HTMLImageElement;
-      let hitScore: number;
-      switch(j % 3) {
-        case 0:
-          img = this.loader.getImage('Android');
-          hitScore = 10;
-          break;
-        case 1:
-          img = this.loader.getImage('Squid');
-          hitScore = 20;
-          break;
-        case 2:
-          img = this.loader.getImage('Death');
-          hitScore = 30;
-          break;
-      }
-      this.gameLogic.spawnEnemyRow(img, this.ctx, hitScore, 2, 30);
-    }
-  }
-
-  // TODO: Move method to game logic
-  // Increases the difficulty of the game according to the current level
-  private increaseDifficulty(): void {
-    if (this.numbOfEnemyRows <= 7 && this.level % 2 === 0) {
-      ++this.numbOfEnemyRows;
-    }
-    if (this.ticksBetweenShots >= 60 && this.level % 3 === 0) {
-      this.ticksBetweenShots -= 10;
-    }
-    if (this.ticksBetweenMoves >= 10 && this.level % 5 === 0) {
-      this.ticksBetweenMoves -= 5;
-    }
-  }
 
   // hides the pre-game modal window
   private hidePreGameModal(): void {

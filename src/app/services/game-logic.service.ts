@@ -13,6 +13,12 @@ export class GameLogicService {
   private _enemyBullets: Bullet[] = [];
   private _explosions: Explosion[] = [];
   private _gameOver: boolean = false;
+  private _enemyRowCount: number = 4;
+  private _ticksBetweenMoves: number = 20;
+  private _movementTicksCount: number = 0;
+  private _ticksBetweenShots: number = 90;
+  private _shotTicksCount: number = 0;
+  private _level: number = 1;
 
   constructor(
   ) {}
@@ -83,10 +89,29 @@ export class GameLogicService {
    * @param ctx canvas rendering context
    */
   fireEnemyBullet(image: HTMLImageElement, ctx: CanvasRenderingContext2D): void {
-    let randomIndex = Math.floor(Math.random() * this._enemies.length);
-    let randomEnemy = this._enemies[randomIndex];
-    let bullet = new Bullet(image, ctx, randomEnemy.x + randomEnemy.width / 2, randomEnemy.y);
-    this._enemyBullets.push(bullet);
+    if (++this._shotTicksCount === this._ticksBetweenShots) {
+      this._shotTicksCount = 0;
+
+      let randomIndex = Math.floor(Math.random() * this._enemies.length);
+      let randomEnemy = this._enemies[randomIndex];
+      let bullet = new Bullet(image, ctx, randomEnemy.x + randomEnemy.width / 2, randomEnemy.y);
+      this._enemyBullets.push(bullet);
+    }
+  }
+
+  spawnEnemies(metaData: EnemyMetaData[], ctx: CanvasRenderingContext2D): void {
+    let count: number = metaData.length;
+    let image: HTMLImageElement;
+    let hitScore: number;
+    let frames: number;
+    let ticksPerFrame: number;
+    for(let i = 0; i < this._enemyRowCount; ++i) {
+      image = metaData[i % count].image;
+      hitScore = metaData[i % count].hitScore;
+      frames = metaData[i % count].frames;
+      ticksPerFrame = metaData[i % count].ticksPerFrame;
+      this.spawnEnemyRow(image, ctx, hitScore, frames, ticksPerFrame);
+    }
   }
 
   /**
@@ -96,9 +121,8 @@ export class GameLogicService {
    * @param hitScore rewarded score for hitting the enemy
    * @param frames number of image _frames
    * @param ticksPerFrame ticks in between two _frames
-   *
    */
-  spawnEnemyRow(img: HTMLImageElement, ctx: CanvasRenderingContext2D, hitScore: number, frames?: number, ticksPerFrame?: number): void {
+  private spawnEnemyRow(img: HTMLImageElement, ctx: CanvasRenderingContext2D, hitScore: number, frames?: number, ticksPerFrame?: number): void {
     let enemiesPerRow = (ctx.canvas.width - 2 * img.width) / (img.width + 10);
     let yPos =img.height;
     if (this._enemies.length > 0) {
@@ -108,6 +132,23 @@ export class GameLogicService {
       let xPos: number = (i * (img.width + 10));
       let enemy: Enemy = new Enemy(img, ctx, xPos, yPos, hitScore, Direction.RIGHT, frames, ticksPerFrame);
       this._enemies.push(enemy);
+    }
+  }
+
+  /**
+   * Increases the difficulty of the game
+   */
+  increaseDifficulty(): void {
+    if (this._enemyRowCount <= 7 && this._level % 2 === 0) {
+      ++this._enemyRowCount;
+    }
+    if (this._ticksBetweenShots >= 60 && this._level % 3 === 0) {
+      this._ticksBetweenShots -= 10;
+      this._shotTicksCount = 0;
+    }
+    if (this._ticksBetweenMoves >= 10 && this._level % 5 === 0) {
+      this._ticksBetweenMoves -= 5;
+      this._movementTicksCount = 0;
     }
   }
 
@@ -208,26 +249,30 @@ export class GameLogicService {
    */
   moveEnemies(): void {
     //TODO: Game over if enemies reached the lower boundary of the game
-    let movementDirection: Direction;
-    let boundaryReached: boolean = false;
-    for (let enemy of this._enemies) {
-      if (enemy.boundaryReached()) {
-        boundaryReached = true;
-      }
-    }
+    if (++this._movementTicksCount === this._ticksBetweenMoves) {
+      this._movementTicksCount = 0;
 
-    for (let enemy of this._enemies) {
-      movementDirection = enemy.movementDirection;
-      if (boundaryReached) {
-        enemy.movementDirection = Direction.DOWN;
-        enemy.move();
-        if (movementDirection === Direction.RIGHT) {
-          enemy.movementDirection = Direction.LEFT;
-        } else {
-          enemy.movementDirection = Direction.RIGHT;
+      let movementDirection: Direction;
+      let boundaryReached: boolean = false;
+      for (let enemy of this._enemies) {
+        if (enemy.boundaryReached()) {
+          boundaryReached = true;
         }
-      } else {
-        enemy.move();
+      }
+
+      for (let enemy of this._enemies) {
+        movementDirection = enemy.movementDirection;
+        if (boundaryReached) {
+          enemy.movementDirection = Direction.DOWN;
+          enemy.move();
+          if (movementDirection === Direction.RIGHT) {
+            enemy.movementDirection = Direction.LEFT;
+          } else {
+            enemy.movementDirection = Direction.RIGHT;
+          }
+        } else {
+          enemy.move();
+        }
       }
     }
   }
@@ -264,17 +309,21 @@ export class GameLogicService {
   }
 
   /**
-   * @return game over
+   * Increases the level of the game by 1 and deletes all bullets currently in game
    */
-  gameIsOver(): boolean {
-    return this._gameOver;
+  increaseLevel(): void {
+    ++this._level;
+    for (let key of this._playerBullets.keys()) {
+      this._playerBullets.set(key, []);
+    }
+    this._enemyBullets = [];
   }
 
   /**
-   * @return number of enemies remaining
+   * @return game over
    */
-  enemiesRemaining(): number {
-    return this._enemies.length;
+  get gameOver(): boolean {
+    return this._gameOver;
   }
 
   /**
@@ -337,4 +386,18 @@ export class GameLogicService {
     return this._explosions;
   }
 
+  /**
+   * @return returns the current level of the game
+   */
+  get level(): number {
+    return this._level;
+  }
+
+}
+
+export interface EnemyMetaData {
+  image: HTMLImageElement;
+  hitScore: number;
+  frames: number;
+  ticksPerFrame: number;
 }

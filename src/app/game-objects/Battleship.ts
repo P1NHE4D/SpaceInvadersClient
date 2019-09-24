@@ -1,7 +1,7 @@
 import {Direction, GameObject} from "./GameObject";
 
 export class Battleship extends GameObject {
-  private _movementSpeed: number = 10;
+  private _movementSpeed: number = 4;
   private _score: number = 0;
   private _lives: number = 3;
 

@@ -29,8 +29,8 @@ describe('LoaderService', () => {
         service.getImage('BlueFighter'),
         service.getImage('A318')
       );
+      expect(images.length).toBe(3);
     });
-    expect(images.length).toBe(3);
   });
 
   it('should preload all audio files', async() => {
@@ -44,7 +44,8 @@ describe('LoaderService', () => {
       audioFiles.push(
         service.getAudio('Explosion')
       );
+      expect(audioFiles.length).toBe(1);
     });
-    expect(audioFiles.length).toBe(1);
+
   });
 });
