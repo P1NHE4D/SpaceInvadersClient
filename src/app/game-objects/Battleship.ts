@@ -1,7 +1,7 @@
-import {Direction, GameObject} from "./GameObject";
+import {Direction} from "./GameObject";
+import {MovableGameObject} from "./MovableGameObject";
 
-export class Battleship extends GameObject {
-  private _movementSpeed: number = 4;
+export class Battleship extends MovableGameObject {
   private _score: number = 0;
   private _lives: number = 3;
 
@@ -22,7 +22,7 @@ export class Battleship extends GameObject {
     frames?: number,
     ticksPerFrame?: number
   ) {
-    super(image, xPos, yPos, ctx, frames, ticksPerFrame);
+    super(image, ctx, xPos, yPos, 4, frames, ticksPerFrame);
     this._xPos -= (this._width / 2);  // centers the ship with respect to its _width
     this._yPos -= this._height;
   }
@@ -75,10 +75,6 @@ export class Battleship extends GameObject {
 
   addLife(): void {
     ++this._lives;
-  }
-
-  get movementSpeed(): number {
-    return this._movementSpeed;
   }
 
 }

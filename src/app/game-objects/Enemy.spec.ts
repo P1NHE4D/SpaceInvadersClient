@@ -8,8 +8,6 @@ describe('Enemy', () => {
   let image: HTMLImageElement;
   let initialX: number;
   let initialY: number;
-  let movementDistance: number;
-  let movementDistanceDown: number;
   let hitScore: number;
 
   beforeEach(() => {
@@ -21,8 +19,6 @@ describe('Enemy', () => {
     image.src = '/assets/gameObjects/AndroidAlien.png';
     initialX = 100;
     initialY = 100;
-    movementDistance = 6;
-    movementDistanceDown = 10;
     hitScore = 40;
     enemy = new Enemy(image, ctx, initialX, initialY, hitScore);
   });
@@ -44,13 +40,13 @@ describe('Enemy', () => {
     enemy.move();
     let x: number = enemy.x;
     let y: number = enemy.y;
-    expect(x).toBe(initialX + movementDistance);
+    expect(x).toBe(initialX + enemy.movementSpeed);
     expect(y).toBe(initialY);
   });
 
   it('should not move the enemy beyond the right canvas border', () => {
     enemy.movementDirection = Direction.RIGHT;
-    for (let i = initialX; i < ctx.canvas.width; i += movementDistance) {
+    for (let i = initialX; i < ctx.canvas.width; i += enemy.movementSpeed) {
       enemy.move();
     }
     let x: number = enemy.x;
@@ -66,13 +62,13 @@ describe('Enemy', () => {
     enemy.move();
     let x: number = enemy.x;
     let y: number = enemy.y;
-    expect(x).toBe(initialX - movementDistance);
+    expect(x).toBe(initialX - enemy.movementSpeed);
     expect(y).toBe(initialY);
   });
 
   it('should not move the enemy beyond the left canvas border', () => {
     enemy.movementDirection = Direction.LEFT;
-    for (let i = initialX; i > 0; i -= movementDistance) {
+    for (let i = initialX; i > 0; i -= enemy.movementSpeed) {
       enemy.move();
     }
     let x: number = enemy.x;
@@ -89,12 +85,12 @@ describe('Enemy', () => {
     let x: number = enemy.x;
     let y: number = enemy.y;
     expect(x).toBe(initialX);
-    expect(y).toBe(initialY + movementDistanceDown);
+    expect(y).toBe(initialY + enemy.verticalMovementSpeed);
   });
 
   it('should not move the enemy beyond the lower canvas border', () => {
     enemy.movementDirection = Direction.DOWN;
-    for (let i = initialY; i < ctx.canvas.height; i += movementDistanceDown) {
+    for (let i = initialY; i < ctx.canvas.height; i += enemy.verticalMovementSpeed) {
       enemy.move();
     }
     let x: number = enemy.x;

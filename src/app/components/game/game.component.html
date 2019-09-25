@@ -1,5 +1,6 @@
 <h3 *ngIf="shipsSelected" class="flex-container-center">Level: {{this.gameLogic.level}}</h3>
 <canvas #canvas ></canvas>
+<!-- TODO: Change design of score bar-->
 <div class="score-bar">
   <div class="flex-container-left left">
     <p class="red" *ngIf="this.gameLogic.getPlayer('playerOne')">P1 Score: {{this.gameLogic.getPlayer('playerOne').score}}</p>
@@ -55,7 +56,6 @@
         <input formControlName="playerTwoName" type="text" class="custom-input mt-20 mb-20" placeholder="Player 2 Name" required>
         <button class="btn btn-main-md mt-20" type="submit" [disabled]="!mpHighScoreForm.valid">Submit</button>
       </form>
-
     </div>
 </div>
 

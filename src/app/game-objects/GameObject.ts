@@ -6,17 +6,17 @@ export abstract class GameObject {
   /**
    * Instantiates a new game object
    * @param _image image that depicts the game object
+   * @param _ctx canvas rendering context
    * @param _xPos initial x-position of the game object
    * @param _yPos initial y-position of the game object
-   * @param _ctx canvas rendering context
    * @param _frames _frames of the image
    * @param _ticksPerFrame refresh rate of the object
    * */
   protected constructor(
     private _image: HTMLImageElement,
+    protected _ctx: CanvasRenderingContext2D,
     protected _xPos: number,
     protected _yPos: number,
-    protected _ctx: CanvasRenderingContext2D,
     protected _frames: number = 1,
     protected _ticksPerFrame: number = 0
 

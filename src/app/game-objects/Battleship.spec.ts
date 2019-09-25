@@ -27,13 +27,13 @@ describe('Battleship', () => {
   it('should move the battleship to the left', () => {
     battleship.move(Direction.LEFT);
     let x: number = battleship.x;
-    expect(x).toBe(100 - 10);
+    expect(x).toBe(100 - battleship.movementSpeed);
   });
 
   it('should move the battleship to the right', () => {
     battleship.move(Direction.RIGHT);
     let x: number = battleship.x;
-    expect(x).toBe(100 + 10);
+    expect(x).toBe(100 + battleship.movementSpeed);
   });
 
   it('should increase the score', () => {

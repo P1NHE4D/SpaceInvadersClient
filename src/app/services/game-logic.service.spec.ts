@@ -85,15 +85,7 @@ describe('GameLogicService', () => {
     expect(enemies.length).toBe(enemiesPerRow);
   });
 
-  it('should fire four enemy bullets', () => {
-    let bullets: Bullet[];
-    service.spawnEnemyRow(enemyImage, ctx, 20);
-    for (let i = 0; i < 4; ++i) {
-      service.fireEnemyBullet(bulletImage, ctx);
-    }
-    bullets = service.enemyBullets;
-    expect(bullets.length).toBe(4);
-  });
+  // TODO: test enemy fire
 
   it('should move all player bullets up', () => {
     let playerBullets: Map<string, Bullet[]>;
@@ -114,22 +106,6 @@ describe('GameLogicService', () => {
     }
   });
 
-  it('should move enemy bullet down', () => {
-    let initialX: number;
-    let initialY: number;
-    let speed: number;
-    service.spawnEnemyRow(enemyImage, ctx, 20);
-    service.fireEnemyBullet(bulletImage, ctx);
-    initialX = service.enemyBullets[0].x;
-    initialY = service.enemyBullets[0].y;
-    speed = service.enemyBullets[0].movementSpeed;
-    service.moveEnemyBullets();
-    let newX: number;
-    let newY: number;
-    newX = service.enemyBullets[0].x;
-    newY = service.enemyBullets[0].y;
-    expect(newX).toBe(initialX);
-    expect(newY).toBe(initialY + speed);
-  });
+  //TODO: Test enemy bullet movement
 
 });

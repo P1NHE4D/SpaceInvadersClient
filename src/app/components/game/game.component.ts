@@ -18,14 +18,14 @@ import {Router} from "@angular/router";
 export class GameComponent implements OnInit {
   // TODO: Rename component
   // TODO: Rename all class instance variables
-  // TODO: Remove private modifiers from methods accessed by template
 
   @Input() multiplayer: boolean = false;
   @ViewChild('canvas', { static: true })
   private canvas: ElementRef;
   private displayPreGameModal: string = 'block';
   private displayGameOverModal: string = 'none';
-
+  private spHighScoreForm: FormGroup;
+  private mpHighScoreForm: FormGroup;
   private ctx: CanvasRenderingContext2D;
   private availableBattleships: HTMLImageElement[] = [];
   private playerOneSelectedBattleship: HTMLImageElement;
@@ -39,10 +39,7 @@ export class GameComponent implements OnInit {
   private cooldownCountPlayerOne: number = 0;
   private cooldownCountPlayerTwo: number = 0;
 
-  private spHighScoreForm: FormGroup;
-  private mpHighScoreForm: FormGroup;
-
-  keys: Map<string, boolean> = new Map<string, boolean>();
+  private keys: Map<string, boolean> = new Map<string, boolean>();
 
 
   constructor(
@@ -95,7 +92,7 @@ export class GameComponent implements OnInit {
   }
 
   // Loads all assets used in the game
-  private loadGameResources(): void {
+  loadGameResources(): void {
     this.loader.preload([
       {name: 'RedFighter', type: 'image', src: '/assets/game-assets/RedFighter.png'},
       {name: 'BlueFighter', type: 'image', src: '/assets/game-assets/BlueFighter.png'},
@@ -112,7 +109,7 @@ export class GameComponent implements OnInit {
   }
 
   // Spawns player(s) and enemies
-  private setupGame(): void {
+  setupGame(): void {
 
     let playerImage = this.playerOneSelectedBattleship;
     let x: number = (this.ctx.canvas.width / 2) - playerImage.width / 2;
@@ -129,9 +126,10 @@ export class GameComponent implements OnInit {
     this.gameSetup = true;
   }
 
-  private gameLoop = () => {
+  gameLoop = () => {
     //TODO: spawn special enemies, e.g. ISS, UFO, nyan-nyan cat
     //TODO: add background music
+    //TODO: Improve fire key handling
 
     // Check for game over
     if (this.gameLogic.gameOver) {
@@ -190,27 +188,27 @@ export class GameComponent implements OnInit {
 
 
   // hides the pre-game modal window
-  private hidePreGameModal(): void {
+  hidePreGameModal(): void {
     this.displayPreGameModal = 'none';
   }
 
   // sets the battleship image selected by player one
-  private selectPlayerOneShip(image: HTMLImageElement): void {
+  selectPlayerOneShip(image: HTMLImageElement): void {
     this.playerOneSelectedBattleship = image;
   }
 
   // sets the battleship image selected by player two
-  private selectPlayerTwoShip(image: HTMLImageElement): void {
+  selectPlayerTwoShip(image: HTMLImageElement): void {
     this.playerTwoSelectedBattleship = image;
   }
 
   // confirms the ship selection
-  private confirmSelection(): void {
+  confirmSelection(): void {
     this.shipsSelected = true;
   }
 
   // Submits high score to server
-  private submitHighScore(): void {
+  submitHighScore(): void {
     let playerOneName: string;
     let score = this.gameLogic.getPlayerScore("playerOne");
     if(this.multiplayer) {

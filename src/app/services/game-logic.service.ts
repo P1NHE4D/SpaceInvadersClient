@@ -47,6 +47,42 @@ export class GameLogicService {
     this._playerBullets.set(playerName, []);
   }
 
+  spawnEnemies(metaData: EnemyMetaData[], ctx: CanvasRenderingContext2D): void {
+    let count: number = metaData.length;
+    let image: HTMLImageElement;
+    let hitScore: number;
+    let frames: number;
+    let ticksPerFrame: number;
+    for(let i = 0; i < this._enemyRowCount; ++i) {
+      image = metaData[i % count].image;
+      hitScore = metaData[i % count].hitScore;
+      frames = metaData[i % count].frames;
+      ticksPerFrame = metaData[i % count].ticksPerFrame;
+      this.spawnEnemyRow(image, ctx, hitScore, frames, ticksPerFrame);
+    }
+  }
+
+  /**
+   * Spawns a single row of enemies filling the entire screen
+   * @param img image used to depict the enemy
+   * @param ctx canvas rendering context
+   * @param hitScore rewarded score for hitting the enemy
+   * @param frames number of image _frames
+   * @param ticksPerFrame ticks in between two _frames
+   */
+  spawnEnemyRow(img: HTMLImageElement, ctx: CanvasRenderingContext2D, hitScore: number, frames?: number, ticksPerFrame?: number): void {
+    let enemiesPerRow = (ctx.canvas.width - 2 * img.width) / (img.width + 10);
+    let yPos =img.height;
+    if (this._enemies.length > 0) {
+      yPos = this._enemies[this._enemies.length - 1].y + img.height + 10;
+    }
+    for (let i = 0; i < enemiesPerRow; ++i) {
+      let xPos: number = (i * (img.width + 10));
+      let enemy: Enemy = new Enemy(img, ctx, xPos, yPos, hitScore, Direction.RIGHT, frames, ticksPerFrame);
+      this._enemies.push(enemy);
+    }
+  }
+
   /**
    * Moves the player to the left
    * @param playerName of player
@@ -66,6 +102,69 @@ export class GameLogicService {
     let player = this._players.get(playerName);
     if (player) {
       player.move(Direction.RIGHT);
+    }
+  }
+
+  /**
+   * Moves the enemies in the game world
+   */
+  moveEnemies(): void {
+    if (++this._movementTicksCount === this._ticksBetweenMoves) {
+      this._movementTicksCount = 0;
+
+      let movementDirection: Direction;
+      let boundaryReached: boolean = false;
+      for (let enemy of this._enemies) {
+        if (enemy.boundaryReached()) {
+          boundaryReached = true;
+        }
+      }
+
+      for (let enemy of this._enemies) {
+        movementDirection = enemy.movementDirection;
+        if (boundaryReached) {
+          enemy.movementDirection = Direction.DOWN;
+          enemy.move();
+          if (movementDirection === Direction.RIGHT) {
+            enemy.movementDirection = Direction.LEFT;
+          } else {
+            enemy.movementDirection = Direction.RIGHT;
+          }
+          for (let player of this._players.values()) {
+            if (enemy.y >= player.y - player.height) {
+              this._gameOver = true;
+            }
+          }
+        } else {
+          enemy.move();
+        }
+      }
+    }
+  }
+
+  /**
+   * Moves each player bullet up
+   */
+  movePlayerBullets(): void {
+    for (let bullets of this._playerBullets.values()) {
+      for (let bullet of bullets) {
+        bullet.move(Direction.UP, () => {
+          let index = bullets.indexOf(bullet);
+          bullets.splice(index, 1);
+        });
+      }
+    }
+  }
+
+  /**
+   * Moves each bullet of the enemy
+   */
+  moveEnemyBullets(): void {
+    for (let bullet of this._enemyBullets) {
+      bullet.move(Direction.DOWN, () => {
+        let index = this._enemyBullets.indexOf(bullet);
+        this._enemyBullets.splice(index, 1);
+      });
     }
   }
 
@@ -96,85 +195,6 @@ export class GameLogicService {
       let randomEnemy = this._enemies[randomIndex];
       let bullet = new Bullet(image, ctx, randomEnemy.x + randomEnemy.width / 2, randomEnemy.y);
       this._enemyBullets.push(bullet);
-    }
-  }
-
-  spawnEnemies(metaData: EnemyMetaData[], ctx: CanvasRenderingContext2D): void {
-    let count: number = metaData.length;
-    let image: HTMLImageElement;
-    let hitScore: number;
-    let frames: number;
-    let ticksPerFrame: number;
-    for(let i = 0; i < this._enemyRowCount; ++i) {
-      image = metaData[i % count].image;
-      hitScore = metaData[i % count].hitScore;
-      frames = metaData[i % count].frames;
-      ticksPerFrame = metaData[i % count].ticksPerFrame;
-      this.spawnEnemyRow(image, ctx, hitScore, frames, ticksPerFrame);
-    }
-  }
-
-  /**
-   * Spawns a single row of enemies filling the entire screen
-   * @param img image used to depict the enemy
-   * @param ctx canvas rendering context
-   * @param hitScore rewarded score for hitting the enemy
-   * @param frames number of image _frames
-   * @param ticksPerFrame ticks in between two _frames
-   */
-  private spawnEnemyRow(img: HTMLImageElement, ctx: CanvasRenderingContext2D, hitScore: number, frames?: number, ticksPerFrame?: number): void {
-    let enemiesPerRow = (ctx.canvas.width - 2 * img.width) / (img.width + 10);
-    let yPos =img.height;
-    if (this._enemies.length > 0) {
-      yPos = this._enemies[this._enemies.length - 1].y + img.height + 10;
-    }
-    for (let i = 0; i < enemiesPerRow; ++i) {
-      let xPos: number = (i * (img.width + 10));
-      let enemy: Enemy = new Enemy(img, ctx, xPos, yPos, hitScore, Direction.RIGHT, frames, ticksPerFrame);
-      this._enemies.push(enemy);
-    }
-  }
-
-  /**
-   * Increases the difficulty of the game
-   */
-  increaseDifficulty(): void {
-    if (this._enemyRowCount <= 7 && this._level % 2 === 0) {
-      ++this._enemyRowCount;
-    }
-    if (this._ticksBetweenShots >= 60 && this._level % 3 === 0) {
-      this._ticksBetweenShots -= 10;
-      this._shotTicksCount = 0;
-    }
-    if (this._ticksBetweenMoves >= 10 && this._level % 5 === 0) {
-      this._ticksBetweenMoves -= 5;
-      this._movementTicksCount = 0;
-    }
-  }
-
-  /**
-   * Moves each player bullet up
-   */
-  movePlayerBullets(): void {
-    for (let bullets of this._playerBullets.values()) {
-      for (let bullet of bullets) {
-        bullet.move(Direction.UP, () => {
-          let index = bullets.indexOf(bullet);
-          bullets.splice(index, 1);
-        });
-      }
-    }
-  }
-
-  /**
-   * Moves each bullet of the enemy
-   */
-  moveEnemyBullets(): void {
-    for (let bullet of this._enemyBullets) {
-      bullet.move(Direction.DOWN, () => {
-        let index = this._enemyBullets.indexOf(bullet);
-        this._enemyBullets.splice(index, 1);
-      });
     }
   }
 
@@ -245,39 +265,6 @@ export class GameLogicService {
   }
 
   /**
-   * Moves the enemies in the game world
-   */
-  moveEnemies(): void {
-    //TODO: Game over if enemies reached the lower boundary of the game
-    if (++this._movementTicksCount === this._ticksBetweenMoves) {
-      this._movementTicksCount = 0;
-
-      let movementDirection: Direction;
-      let boundaryReached: boolean = false;
-      for (let enemy of this._enemies) {
-        if (enemy.boundaryReached()) {
-          boundaryReached = true;
-        }
-      }
-
-      for (let enemy of this._enemies) {
-        movementDirection = enemy.movementDirection;
-        if (boundaryReached) {
-          enemy.movementDirection = Direction.DOWN;
-          enemy.move();
-          if (movementDirection === Direction.RIGHT) {
-            enemy.movementDirection = Direction.LEFT;
-          } else {
-            enemy.movementDirection = Direction.RIGHT;
-          }
-        } else {
-          enemy.move();
-        }
-      }
-    }
-  }
-
-  /**
    * Renders all game objects
    */
   renderGameObjects(): void {
@@ -317,6 +304,23 @@ export class GameLogicService {
       this._playerBullets.set(key, []);
     }
     this._enemyBullets = [];
+  }
+
+  /**
+   * Increases the difficulty of the game
+   */
+  increaseDifficulty(): void {
+    if (this._enemyRowCount <= 7 && this._level % 2 === 0) {
+      ++this._enemyRowCount;
+    }
+    if (this._ticksBetweenShots >= 60 && this._level % 3 === 0) {
+      this._ticksBetweenShots -= 10;
+      this._shotTicksCount = 0;
+    }
+    if (this._ticksBetweenMoves >= 10 && this._level % 5 === 0) {
+      this._ticksBetweenMoves -= 5;
+      this._movementTicksCount = 0;
+    }
   }
 
   /**

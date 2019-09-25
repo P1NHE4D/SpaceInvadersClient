@@ -1,7 +1,7 @@
-import {Direction, GameObject} from "./GameObject";
+import {Direction} from "./GameObject";
+import {MovableGameObject} from "./MovableGameObject";
 
-export class Bullet extends GameObject {
-  private readonly _movementSpeed: number = 2;
+export class Bullet extends MovableGameObject {
 
   /**
    * Instantiates a new bullet
@@ -16,7 +16,7 @@ export class Bullet extends GameObject {
     xPos: number,
     yPos: number
   ) {
-    super(image, xPos, yPos, ctx);
+    super(image, ctx, xPos, yPos, 2);
   }
 
   /**
@@ -29,14 +29,14 @@ export class Bullet extends GameObject {
       case Direction.UP:
         if (this._yPos - this._movementSpeed > 0) {
           this._yPos -= this._movementSpeed;
-        } else {
+        } else if (boundaryReached()){
           boundaryReached();
         }
         break;
       case Direction.DOWN:
         if (this._yPos + this._movementSpeed < this._ctx.canvas.height) {
           this._yPos += this._movementSpeed;
-        } else {
+        } else if(boundaryReached()) {
           boundaryReached();
         }
         break;
@@ -58,13 +58,6 @@ export class Bullet extends GameObject {
         (this._yPos <= yPos + height && this._yPos >= yPos) ||
         (this._yPos + this._height >= yPos && this._yPos + this._height <= yPos + height)
       )
-  }
-
-  /**
-   * @return returns the movement speed of the bullet
-   */
-  get movementSpeed(): number {
-    return this._movementSpeed;
   }
 
 }

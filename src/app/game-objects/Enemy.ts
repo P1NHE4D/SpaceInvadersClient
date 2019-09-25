@@ -1,7 +1,7 @@
-import {Direction, GameObject} from "./GameObject";
+import {Direction} from "./GameObject";
+import {MovableGameObject} from "./MovableGameObject";
 
-export class Enemy extends GameObject {
-  private readonly _horizontalMovementSpeed: number = 6;
+export class Enemy extends MovableGameObject {
   private readonly _verticalMovementSpeed: number = 10;
 
   /**
@@ -25,7 +25,7 @@ export class Enemy extends GameObject {
     frames?: number,
     ticksPerFrame?: number
   ) {
-    super(image, xPos, yPos, ctx, frames, ticksPerFrame);
+    super(image, ctx, xPos, yPos, 6, frames, ticksPerFrame);
   }
 
   /**
@@ -34,13 +34,13 @@ export class Enemy extends GameObject {
    move(): void {
     switch(this._movementDirection) {
       case Direction.RIGHT:
-        if ((this._xPos + this._horizontalMovementSpeed + this._width) < this._ctx.canvas.width) {
-          this._xPos += this._horizontalMovementSpeed;
+        if ((this._xPos + this._movementSpeed + this._width) < this._ctx.canvas.width) {
+          this._xPos += this._movementSpeed;
         }
         break;
       case Direction.LEFT:
-        if (this._xPos - this._horizontalMovementSpeed > 0) {
-          this._xPos -= this._horizontalMovementSpeed;
+        if (this._xPos - this._movementSpeed > 0) {
+          this._xPos -= this._movementSpeed;
         }
         break;
       case Direction.DOWN:
@@ -57,9 +57,9 @@ export class Enemy extends GameObject {
    boundaryReached(): boolean {
     switch(this._movementDirection) {
       case Direction.RIGHT:
-        return (this._xPos + this._width + this._horizontalMovementSpeed) >= this._ctx.canvas.width;
+        return (this._xPos + this._width + this._movementSpeed) >= this._ctx.canvas.width;
       case Direction.LEFT:
-        return this._xPos - this._horizontalMovementSpeed <= 0;
+        return this._xPos - this._movementSpeed <= 0;
       case Direction.DOWN:
         return this._yPos + this._verticalMovementSpeed >= this._ctx.canvas.height;
     }
@@ -85,5 +85,12 @@ export class Enemy extends GameObject {
    */
   get hitScore(): number {
     return this._hitScore;
+  }
+
+  /**
+   * Returns the vertical movement speed
+   */
+  get verticalMovementSpeed(): number {
+    return this._verticalMovementSpeed;
   }
 }

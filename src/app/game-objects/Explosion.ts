@@ -10,7 +10,7 @@ export class Explosion extends GameObject {
     frames: number,
     ticksPerFrame: number
   ) {
-    super(image, xPos, yPos, ctx, frames, ticksPerFrame)
+    super(image, ctx, xPos, yPos, frames, ticksPerFrame)
   }
 
   /**
