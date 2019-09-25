@@ -170,10 +170,11 @@ input.custom-input:focus {
 
 ::-webkit-scrollbar {
   width: 4px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {
-  background: none;
+  background-color: #000000;
 }
 
 ::-webkit-scrollbar-thumb {

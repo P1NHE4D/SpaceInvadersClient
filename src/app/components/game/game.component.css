@@ -1,12 +1,14 @@
 canvas {
   background-color: rgba(0,0,0,0.65);
+  padding: 0;
+  margin: 0;
 }
 
 p {
   padding: 0;
-  margin: 0;
+  margin: 0 10px 0 10px;
   font-family: "American Captain";
-  font-size: 14pt;
+  font-size: 20pt;
   color: #ffffff;
 }
 
@@ -18,9 +20,35 @@ p {
   color: #0047B0;
 }
 
-.score-bar {
+.game-container {
+  width: 700px;
+  display: flex;
+  flex-direction: column;
+}
+
+.hud {
   padding: 0;
   margin: 0;
+  background-color: rgba(0,0,0,0.65);
+  height: 50px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  border-top: 1pt #FFFFFF solid;
+}
+
+.hud-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  height: 100%;
+  margin: 2px;
+}
+
+.score {
+  width: 120px;
 }
 
 .preview-tile {

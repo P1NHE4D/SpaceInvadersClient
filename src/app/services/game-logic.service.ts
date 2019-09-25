@@ -131,7 +131,7 @@ export class GameLogicService {
             enemy.movementDirection = Direction.RIGHT;
           }
           for (let player of this._players.values()) {
-            if (enemy.y >= player.y - player.height) {
+            if (enemy.y + enemy.height >= player.y) {
               this._gameOver = true;
             }
           }

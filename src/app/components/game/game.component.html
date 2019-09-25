@@ -1,16 +1,26 @@
-<h3 *ngIf="shipsSelected" class="flex-container-center">Level: {{this.gameLogic.level}}</h3>
-<canvas #canvas ></canvas>
-<!-- TODO: Change design of score bar-->
-<div class="score-bar">
-  <div class="flex-container-left left">
-    <p class="red" *ngIf="this.gameLogic.getPlayer('playerOne')">P1 Score: {{this.gameLogic.getPlayer('playerOne').score}}</p>
-    <p class="red" *ngIf="this.gameLogic.getPlayer('playerOne')">P1 Lives: {{this.gameLogic.getPlayer('playerOne').lives}}</p>
-  </div>
-  <div class="flex-container-left right">
-    <p class="blue" *ngIf="this.gameLogic.getPlayer('playerTwo')">P2 Score: {{this.gameLogic.getPlayer('playerTwo').score}}</p>
-    <p class="blue" *ngIf="this.gameLogic.getPlayer('playerTwo')">P2 Lives: {{this.gameLogic.getPlayer('playerTwo').lives}}</p>
+<h3 *ngIf="shipsSelected" class="flex-container-center red">Level: {{this.gameLogic.level}}</h3>
+
+<div class="game-container">
+  <canvas #canvas ></canvas>
+  <div class="hud" *ngIf="shipsSelected">
+    <div class="hud-group">
+      <div class="score">
+        <p>{{this.gameLogic.getPlayer('playerOne').score}}</p>
+      </div>
+      <img src="{{playerOneSelectedBattleship.src}}" style="height: 50%"/>
+      <p> {{this.gameLogic.getPlayer('playerOne').lives}}</p>
+    </div>
+    <div class="hud-group" style="margin-left: auto">
+      <p *ngIf="multiplayer">{{this.gameLogic.getPlayer('playerTwo').lives}}</p>
+      <img *ngIf="multiplayer" src="{{playerTwoSelectedBattleship.src}}" style="height: 50%"/>
+      <div class="score">
+        <p style="float: right !important" *ngIf="multiplayer">{{this.gameLogic.getPlayer('playerTwo').score}}</p>
+      </div>
+    </div>
   </div>
 </div>
+
+
 
 <div class="modal" [ngStyle]="{'display': displayPreGameModal}">
     <div class="flex-container-center">
