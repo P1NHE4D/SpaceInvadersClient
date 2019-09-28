@@ -221,7 +221,7 @@ export class GameLogicService {
           if (bullet.intersectsWithObject(enemy.x, enemy.width, enemy.y, enemy.height)) {
             let index = bullets.indexOf(bullet);
             bullets.splice(index, 1);
-            if ((playerObject.score % 1000) + enemy.hitScore >= 1000) {
+            if ((playerObject.score % 2000) + enemy.hitScore >= 2000) {
               playerObject.addLife();
             }
             playerObject.addToScore(enemy.hitScore);
@@ -324,7 +324,7 @@ export class GameLogicService {
     if (this._enemyRowCount <= 7 && this._level % 2 === 0) {
       ++this._enemyRowCount;
     }
-    if (this._ticksBetweenShots >= 60 && this._level % 3 === 0) {
+    if (this._ticksBetweenShots >= 50 && this._level % 3 === 0) {
       this._ticksBetweenShots -= 10;
       this._shotTicksCount = 0;
     }
@@ -424,6 +424,10 @@ export class GameLogicService {
    */
   get level(): number {
     return this._level;
+  }
+
+  get soundMuted(): boolean {
+    return this._soundMuted;
   }
 
 }

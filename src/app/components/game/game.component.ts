@@ -165,7 +165,6 @@ export class GameComponent implements OnInit {
       }
       if(this.keys.get("w") === true && this.cooldownCountPlayerTwo === this.fireCoolDown) {
         this.cooldownCountPlayerTwo = 0;
-        this.loader.getAudio("LaserShot").play();
         this.gameLogic.fireBullet("playerTwo", this.loader.getImage("PlayerTwoBullet"), this.ctx);
       }
     }

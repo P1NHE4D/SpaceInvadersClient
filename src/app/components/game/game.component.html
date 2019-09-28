@@ -1,8 +1,17 @@
-<h3 *ngIf="shipsSelected" class="flex-container-center red">Level: {{this.gameLogic.level}}</h3>
+<div class="game-container" [class.display-hidden]="!shipsSelected || gameLogic.gameOver">
 
-<div class="game-container">
+  <div class="hud border-bottom" *ngIf="shipsSelected">
+    <div class="hud-group">
+      <p>Level: {{this.gameLogic.level}}</p>
+    </div>
+    <div class="hud-group" style="margin-left: auto">
+      <button class="btn btn-main" [class.btn-disabled]="gameLogic.soundMuted" (click)="gameLogic.switchSoundMuted()"><i class="fa" [class.fa-bell-slash-o]="gameLogic.soundMuted" [class.fa-bell-o]="!gameLogic.soundMuted"></i></button>
+    </div>
+  </div>
+
   <canvas #canvas ></canvas>
-  <div class="hud" *ngIf="shipsSelected">
+
+  <div class="hud border-top" *ngIf="shipsSelected">
     <div class="hud-group">
       <div class="score">
         <p>{{this.gameLogic.getPlayer('playerOne').score}}</p>
@@ -10,21 +19,23 @@
       <img src="{{playerOneSelectedBattleship.src}}" style="height: 50%"/>
       <p> {{this.gameLogic.getPlayer('playerOne').lives}}</p>
     </div>
-    <div class="hud-group" style="margin-left: auto">
-      <p *ngIf="multiplayer">{{this.gameLogic.getPlayer('playerTwo').lives}}</p>
-      <img *ngIf="multiplayer" src="{{playerTwoSelectedBattleship.src}}" style="height: 50%"/>
+    <div class="hud-group" style="margin-left: auto" *ngIf="multiplayer">
+      <p>{{this.gameLogic.getPlayer('playerTwo').lives}}</p>
+      <img src="{{playerTwoSelectedBattleship.src}}" style="height: 50%"/>
       <div class="score">
-        <p style="float: right !important" *ngIf="multiplayer">{{this.gameLogic.getPlayer('playerTwo').score}}</p>
+        <p style="float: right !important">{{this.gameLogic.getPlayer('playerTwo').score}}</p>
       </div>
     </div>
   </div>
-</div>
 
+</div>
 
 
 <div class="modal" [ngStyle]="{'display': displayPreGameModal}">
     <div class="flex-container-center">
+
       <h2 class="main-title mb-20" *ngIf="shipsSelected">Ready?</h2>
+
       <p class="mb-10" *ngIf="!shipsSelected">Player 1: Select a Battleship</p>
       <div *ngIf="gameLoaded && !shipsSelected" class="row mb-20">
         <div class="preview-tile" *ngFor="let image of availableBattleships" (click)="selectPlayerOneShip(image)" [class.active]="image === playerOneSelectedBattleship">
@@ -32,8 +43,8 @@
             <img src="{{image.src}}"/>
           </div>
         </div>
-
       </div>
+
       <p class="mb-10" *ngIf="multiplayer && !shipsSelected">Player 2: Select a Battleship</p>
       <div *ngIf="gameLoaded && multiplayer && !shipsSelected" class="row mb-20">
         <div class="preview-tile" *ngFor="let image of availableBattleships" (click)="selectPlayerTwoShip(image)" [class.active]="image === playerTwoSelectedBattleship">
@@ -42,6 +53,7 @@
           </div>
         </div>
       </div>
+
       <div class="row">
         <button class="btn-main-md" routerLink="/"><i class="fa fa-times"></i> Abort Mission</button>
         <button class="btn-main-md" *ngIf="!gameLoaded" disabled><i class="fa fa-spinner fa-pulse"></i> Loading...</button>
@@ -52,19 +64,25 @@
     </div>
 </div>
 
+
 <div *ngIf="gameLoaded && shipsSelected" class="modal" [ngStyle]="{'display': displayGameOverModal}">
+
     <div class="flex-container-center">
+
       <h2 class="main-title">Game Over</h2>
       <h3>Score: {{this.gameLogic.getTotalScore()}} </h3>
+
       <form *ngIf="!multiplayer" [formGroup]="spHighScoreForm" (ngSubmit)="submitHighScore()">
         <input formControlName="playerOneName" type="text" class="custom-input mt-20" placeholder="Player 1 Name" required>
         <button class="btn btn-main-md mt-20" type="submit" [disabled]="!spHighScoreForm.valid">Submit</button>
       </form>
+
       <form *ngIf="multiplayer" [formGroup]="mpHighScoreForm" (ngSubmit)="submitHighScore()">
         <input formControlName="playerOneName" type="text" class="custom-input mt-20" placeholder="Player 1 Name" required>
         <input formControlName="playerTwoName" type="text" class="custom-input mt-20 mb-20" placeholder="Player 2 Name" required>
         <button class="btn btn-main-md mt-20" type="submit" [disabled]="!mpHighScoreForm.valid">Submit</button>
       </form>
     </div>
+
 </div>
 

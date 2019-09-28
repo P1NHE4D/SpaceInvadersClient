@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from "rxjs";
-import {Howl} from "howler";
+import {Howl, Howler} from "howler";
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +17,7 @@ export class LoaderService {
     this._resourceCount = 0;
     this._loadedImages = new Map<string, HTMLImageElement>();
     this._loadedAudioFiles = new Map<string, Howl>();
+    Howler.autoUnlock = false;
   }
 
   resourcesLoaded$ = this._resourcesLoadedSource.asObservable();
@@ -84,14 +85,6 @@ export class LoaderService {
       onloaderror: () => onerror(),
       onload: () => onload()
     }));
-
-    //this._loadedAudioFiles.set(audio.name, new Audio());
-    //this._loadedAudioFiles.get(audio.name).onerror = () => {
-    //  onerror();
-    //};
-    //this._loadedAudioFiles.get(audio.name).src = audio.src;
-    //onload();
-
   }
 
   private load(resource, onload: () => any, onerror: () => any): void {

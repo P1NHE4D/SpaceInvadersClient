@@ -35,7 +35,6 @@ p {
   flex-direction: row;
   align-items: center;
   width: 100%;
-  border-top: 1pt #FFFFFF solid;
 }
 
 .hud-group {
@@ -70,6 +69,10 @@ p {
 
 .preview-tile:hover {
   cursor: pointer;
+}
+
+.display-hidden {
+  display: none;
 }
 
 form {
