@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from "rxjs";
+import {Howl} from "howler";
 
 @Injectable({
   providedIn: 'root'
@@ -8,14 +9,14 @@ export class LoaderService {
   private _loadCount: number;
   private _resourceCount: number;
   private _loadedImages: Map<string, HTMLImageElement>;
-  private _loadedAudioFiles: Map<string, HTMLAudioElement>;
+  private _loadedAudioFiles: Map<string, Howl>;
   private _resourcesLoadedSource = new Subject<number>();
 
   constructor() {
     this._loadCount = 0;
     this._resourceCount = 0;
     this._loadedImages = new Map<string, HTMLImageElement>();
-    this._loadedAudioFiles = new Map<string, HTMLAudioElement>();
+    this._loadedAudioFiles = new Map<string, Howl>();
   }
 
   resourcesLoaded$ = this._resourcesLoadedSource.asObservable();
@@ -34,7 +35,7 @@ export class LoaderService {
    * @param name name of the audio file
    * @return returns an audio file
    */
-  getAudio(name: string): HTMLAudioElement {
+  getAudio(name: string): Howl {
     return this._loadedAudioFiles.get(name);
   }
 
@@ -77,13 +78,19 @@ export class LoaderService {
   }
 
   private preloadAudio(audio: FileDict, onload: () => any, onerror: () => any): void {
-    this._loadedAudioFiles.set(audio.name, new Audio());
-    this._loadedAudioFiles.get(audio.name).src = audio.src;
-    this._loadedAudioFiles.get(audio.name).load();
-    this._loadedAudioFiles.get(audio.name).onerror = () => {
-      onerror();
-    };
-    onload();
+    this._loadedAudioFiles.set(audio.name, new Howl({
+      src: audio.src,
+      html5: true,
+      onloaderror: () => onerror(),
+      onload: () => onload()
+    }));
+
+    //this._loadedAudioFiles.set(audio.name, new Audio());
+    //this._loadedAudioFiles.get(audio.name).onerror = () => {
+    //  onerror();
+    //};
+    //this._loadedAudioFiles.get(audio.name).src = audio.src;
+    //onload();
 
   }
 

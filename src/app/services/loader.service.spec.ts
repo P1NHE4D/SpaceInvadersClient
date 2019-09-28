@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import {FileDict, LoaderService} from './loader.service';
+import {Howl} from "howler";
 
 describe('LoaderService', () => {
   let files: FileDict[];
@@ -36,15 +37,17 @@ describe('LoaderService', () => {
   it('should preload all audio files', async() => {
     const service: LoaderService = TestBed.get(LoaderService);
     files = [
-      {name: 'Explosion', type: 'audio', src: '/assets/game-assets/explosion.wav'},
+      {name: 'Explosion01', type: 'audio', src: '/assets/game-assets/explosion01.mp3'},
+      {name: 'Explosion02', type: 'audio', src: '/assets/game-assets/explosion02.mp3'},
     ];
     service.preload(files);
-    let audioFiles: HTMLAudioElement[] = [];
+    let audioFiles: Howl[] = [];
     await service.resourcesLoaded$.subscribe(() => {
       audioFiles.push(
-        service.getAudio('Explosion')
+        service.getAudio('Explosion01'),
+        service.getAudio('Explosion02')
       );
-      expect(audioFiles.length).toBe(1);
+      expect(audioFiles.length).toBe(2);
     });
 
   });

@@ -52,11 +52,10 @@
     </div>
 </div>
 
-<div class="modal" [ngStyle]="{'display': displayGameOverModal}">
+<div *ngIf="gameLoaded && shipsSelected" class="modal" [ngStyle]="{'display': displayGameOverModal}">
     <div class="flex-container-center">
       <h2 class="main-title">Game Over</h2>
-      <h3 *ngIf="this.gameLogic.getPlayer('playerOne')" class="red mt-20">Player 1 Score: {{this.gameLogic.getPlayer('playerOne').score}}</h3>
-      <h3 *ngIf="this.gameLogic.getPlayer('playerTwo')" class="blue mb-20">Player 2 Score: {{this.gameLogic.getPlayer('playerTwo').score}}</h3>
+      <h3>Score: {{this.gameLogic.getTotalScore()}} </h3>
       <form *ngIf="!multiplayer" [formGroup]="spHighScoreForm" (ngSubmit)="submitHighScore()">
         <input formControlName="playerOneName" type="text" class="custom-input mt-20" placeholder="Player 1 Name" required>
         <button class="btn btn-main-md mt-20" type="submit" [disabled]="!spHighScoreForm.valid">Submit</button>

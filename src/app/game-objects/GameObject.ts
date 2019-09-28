@@ -9,7 +9,7 @@ export abstract class GameObject {
    * @param _ctx canvas rendering context
    * @param _xPos initial x-position of the game object
    * @param _yPos initial y-position of the game object
-   * @param _frames _frames of the image
+   * @param _frames frames of the image
    * @param _ticksPerFrame refresh rate of the object
    * */
   protected constructor(

@@ -106,4 +106,11 @@ describe('Enemy', () => {
     expect(score).toBe(hitScore);
   });
 
+  it('should set the movement direction', () => {
+    enemy.movementDirection = Direction.LEFT;
+    expect(enemy.movementDirection).toBe(Direction.LEFT);
+    enemy.movementDirection = Direction.RIGHT;
+    expect(enemy.movementDirection).toBe(Direction.RIGHT);
+  })
+
 });

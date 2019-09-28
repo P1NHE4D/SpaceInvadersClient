@@ -4,6 +4,7 @@ import {Battleship} from "../game-objects/Battleship";
 import {Bullet} from "../game-objects/Bullet";
 import {Enemy} from "../game-objects/Enemy";
 import {Explosion} from "../game-objects/Explosion";
+import {Howl} from "howler";
 
 @Injectable()
 export class GameLogicService {
@@ -19,6 +20,7 @@ export class GameLogicService {
   private _ticksBetweenShots: number = 90;
   private _shotTicksCount: number = 0;
   private _level: number = 1;
+  private _soundMuted: boolean = false;
 
   constructor(
   ) {}
@@ -72,7 +74,7 @@ export class GameLogicService {
    */
   spawnEnemyRow(img: HTMLImageElement, ctx: CanvasRenderingContext2D, hitScore: number, frames?: number, ticksPerFrame?: number): void {
     let enemiesPerRow = (ctx.canvas.width - 2 * img.width) / (img.width + 10);
-    let yPos =img.height;
+    let yPos = img.height;
     if (this._enemies.length > 0) {
       yPos = this._enemies[this._enemies.length - 1].y + img.height + 10;
     }
@@ -173,12 +175,16 @@ export class GameLogicService {
    * @param playerName name of the player object
    * @param img image used to depict the bullet
    * @param ctx canvas rendering context
+   * @param audio optional audio that will be played when firing a bullet
    */
-  fireBullet(playerName: string, img: HTMLImageElement, ctx: CanvasRenderingContext2D): void {
+  fireBullet(playerName: string, img: HTMLImageElement, ctx: CanvasRenderingContext2D, audio?: Howl): void {
     let player = this._players.get(playerName);
     if (player) {
       let bullet = new Bullet(img, ctx, player.x + player.width / 2, player.y);
       this._playerBullets.get(playerName).push(bullet);
+      if (audio && !this._soundMuted) {
+        audio.play();
+      }
     }
   }
 
@@ -188,7 +194,7 @@ export class GameLogicService {
    * @param ctx canvas rendering context
    */
   fireEnemyBullet(image: HTMLImageElement, ctx: CanvasRenderingContext2D): void {
-    if (++this._shotTicksCount === this._ticksBetweenShots) {
+    if (++this._shotTicksCount === this._ticksBetweenShots && this.enemies.length > 0) {
       this._shotTicksCount = 0;
 
       let randomIndex = Math.floor(Math.random() * this._enemies.length);
@@ -204,8 +210,9 @@ export class GameLogicService {
    * @param ctx canvas rendering context
    * @param frames _frames of the image
    * @param ticksPerFrame ticks between two _frames of the image
+   * @param audio optional audio that will be played on impact
    */
-  checkForPlayerBulletIntersections(image: HTMLImageElement, ctx: CanvasRenderingContext2D, frames: number, ticksPerFrame: number) {
+  checkForPlayerBulletIntersections(image: HTMLImageElement, ctx: CanvasRenderingContext2D, frames: number, ticksPerFrame: number, audio?: Howl) {
     for (let enemy of this._enemies) {
       for (let playerName of this._playerBullets.keys()) {
         let bullets: Bullet[] = this._playerBullets.get(playerName);
@@ -219,7 +226,9 @@ export class GameLogicService {
             }
             playerObject.addToScore(enemy.hitScore);
             index = this._enemies.indexOf(enemy);
-            // TODO: Add explosion sound
+            if (audio && !this._soundMuted) {
+              audio.play();
+            }
             let explosion = new Explosion(image, ctx, enemy.x, enemy.y, frames, ticksPerFrame);
             this._explosions.push(explosion);
             this._enemies.splice(index, 1);
@@ -235,8 +244,9 @@ export class GameLogicService {
    * @param ctx canvas rendering context
    * @param frames _frames of the image
    * @param ticksPerFrame ticks between two _frames of the image
+   * @param audio optional audio that will be played on impact
    */
-  checkForEnemyBulletIntersections(image: HTMLImageElement, ctx: CanvasRenderingContext2D, frames: number, ticksPerFrame: number) {
+  checkForEnemyBulletIntersections(image: HTMLImageElement, ctx: CanvasRenderingContext2D, frames: number, ticksPerFrame: number, audio?: Howl) {
     for (let player of this._players.values()) {
       for (let bullet of this._enemyBullets) {
         if (bullet.intersectsWithObject(player.x, player.width, player.y, player.height)) {
@@ -252,12 +262,13 @@ export class GameLogicService {
           }
           let explosion = new Explosion(image, ctx, x, y, frames, ticksPerFrame);
           this._explosions.push(explosion);
+          if (audio && !this._soundMuted) {
+            audio.play();
+          }
           player.removeLife();
           if (player.lives === 0) {
             this._gameOver = true;
           }
-          //TODO: Add explosion sound and animation
-          //TODO: if player is hit, remove player from game for a period of time and respawn
         }
       }
     }
@@ -324,6 +335,13 @@ export class GameLogicService {
   }
 
   /**
+   * Enables / Disables in-game sounds
+   */
+  switchSoundMuted(): void {
+    this._soundMuted = !this._soundMuted;
+  }
+
+  /**
    * @return game over
    */
   get gameOver(): boolean {
@@ -336,6 +354,17 @@ export class GameLogicService {
    */
   getPlayerScore(playerName: string): number {
     return this._players.get(playerName).score;
+  }
+
+  /**
+   * @return returns total score
+   */
+  getTotalScore(): number {
+    let score: number = 0;
+    for (let player of this._players.values()) {
+      score += player.score;
+    }
+    return score;
   }
 
   /**

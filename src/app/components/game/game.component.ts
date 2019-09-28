@@ -16,8 +16,6 @@ import {Router} from "@angular/router";
   providers: [GameLogicService]
 })
 export class GameComponent implements OnInit {
-  // TODO: Rename component
-  // TODO: Rename all class instance variables
 
   @Input() multiplayer: boolean = false;
   @ViewChild('canvas', { static: true })
@@ -67,7 +65,8 @@ export class GameComponent implements OnInit {
       this.availableBattleships.push(
         this.loader.getImage('RedFighter'),
         this.loader.getImage('BlueFighter'),
-        this.loader.getImage('A318')
+        this.loader.getImage('A318'),
+        this.loader.getImage('Eurofighter')
       );
       this.playerOneSelectedBattleship = this.loader.getImage('RedFighter');
       this.playerTwoSelectedBattleship = this.loader.getImage('RedFighter');
@@ -97,6 +96,7 @@ export class GameComponent implements OnInit {
       {name: 'RedFighter', type: 'image', src: '/assets/game-assets/RedFighter.png'},
       {name: 'BlueFighter', type: 'image', src: '/assets/game-assets/BlueFighter.png'},
       {name: 'A318', type: 'image', src: '/assets/game-assets/A318.png'},
+      {name: 'Eurofighter', type: 'image', src: '/assets/game-assets/Eurofighter.png'},
       {name: 'PlayerOneBullet', type: 'image', src: '/assets/game-assets/PlayerOneBullet.png'},
       {name: 'PlayerTwoBullet', type: 'image', src: '/assets/game-assets/PlayerTwoBullet.png'},
       {name: 'EnemyBullet', type: 'image', src: '/assets/game-assets/EnemyBullet.png'},
@@ -105,6 +105,9 @@ export class GameComponent implements OnInit {
       {name: 'Death', type: 'image', src: '/assets/game-assets/DeathAlien.png'},
       {name: 'Explosion', type: 'image', src: '/assets/game-assets/Explosion.png'},
       {name: 'BigExplosion', type: 'image', src: '/assets/game-assets/BigExplosion.png'},
+      {name: 'LaserShot', type: 'audio', src: '/assets/game-assets/laser.mp3'},
+      {name: 'ExplosionSound01', type: 'audio', src: '/assets/game-assets/explosion01.mp3'},
+      {name: 'ExplosionSound02', type: 'audio', src: '/assets/game-assets/explosion02.mp3'}
     ]);
   }
 
@@ -129,7 +132,6 @@ export class GameComponent implements OnInit {
   gameLoop = () => {
     //TODO: spawn special enemies, e.g. ISS, UFO, nyan-nyan cat
     //TODO: add background music
-    //TODO: Improve fire key handling
 
     // Check for game over
     if (this.gameLogic.gameOver) {
@@ -149,7 +151,7 @@ export class GameComponent implements OnInit {
     }
     if(this.keys.get("ArrowUp") === true && this.cooldownCountPlayerOne === this.fireCoolDown) {
       this.cooldownCountPlayerOne = 0;
-      this.gameLogic.fireBullet("playerOne", this.loader.getImage("PlayerOneBullet"), this.ctx);
+      this.gameLogic.fireBullet("playerOne", this.loader.getImage("PlayerOneBullet"), this.ctx, this.loader.getAudio("LaserShot"));
     }
 
     if (this.multiplayer) {
@@ -163,13 +165,14 @@ export class GameComponent implements OnInit {
       }
       if(this.keys.get("w") === true && this.cooldownCountPlayerTwo === this.fireCoolDown) {
         this.cooldownCountPlayerTwo = 0;
+        this.loader.getAudio("LaserShot").play();
         this.gameLogic.fireBullet("playerTwo", this.loader.getImage("PlayerTwoBullet"), this.ctx);
       }
     }
 
     // handle game objects
-    this.gameLogic.checkForPlayerBulletIntersections(this.loader.getImage("Explosion"), this.ctx, 32, 1);
-    this.gameLogic.checkForEnemyBulletIntersections(this.loader.getImage("BigExplosion"), this.ctx, 32, 1);
+    this.gameLogic.checkForPlayerBulletIntersections(this.loader.getImage("Explosion"), this.ctx, 32, 1, this.loader.getAudio("ExplosionSound01"));
+    this.gameLogic.checkForEnemyBulletIntersections(this.loader.getImage("BigExplosion"), this.ctx, 32, 1, this.loader.getAudio("ExplosionSound02"));
     if (this.gameLogic.enemies.length === 0) {
       this.gameLogic.increaseLevel();
       this.gameLogic.increaseDifficulty();
