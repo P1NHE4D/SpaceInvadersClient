@@ -1,5 +1,5 @@
 # SpaceInvaders
-The space invaders application consists of a client and a server. The client is based on Angular and handles the actual gameplay, whereas the server uses C# and SQLite to store the scores achieved by the players.
+The space invaders application consists of a client and a server. The client is based on Angular and handles the actual gameplay, whereas the server uses ASP.NET CORE and an SQLite database to store the scores achieved by the players.
 Hence, both the client and server have to be installed for the application to work.
 
 After installing the required packages, please refer to the [Execution](#execution) section.
@@ -38,7 +38,7 @@ sudo apt-get install -y nodejs
 #### Ubuntu
 `sudo npm install -y -g @angular/cli`
 
-### 4. Install project dependencies
+### 4. Install Project Dependencies
 Make sure you are in the main directory of the SpaceInvadersClient project or provide the path to the package.json file located in the project folder to the `npm install` command as an argument.
 
 #### Windows
