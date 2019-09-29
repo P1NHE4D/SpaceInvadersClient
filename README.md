@@ -1,10 +1,17 @@
-# SpaceInvadersClient
-
-## Installation
+# SpaceInvaders
 The space invaders application consists of a client and a server. The client is based on Angular and handles the actual gameplay, whereas the server uses C# and SQLite to store the scores achieved by the players.
 Hence, both the client and server have to be installed for the application to work.
 
 After installing the required packages, please refer to the [Execution](#execution) section.
+
+## Table of Contents
+1. [Client Installation Guide](#spaceinvadersclient)
+2. [Server Installation Guide](#spaceinvadersserver)
+3. [Executing the Application](#execution)
+
+# SpaceInvadersClient
+
+## Installation
 
 ### 1. Install node.js
 Angular 8 requires nodejs 10.9 or greater
