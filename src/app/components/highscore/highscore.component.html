@@ -33,7 +33,7 @@
       </tr>
       </thead>
       <tbody>
-      <tr *ngFor="let entry of mpHighScores; let i = index">
+      <tr *ngFor="let entry of mpHighScores | slice:0:10; let i = index">
         <td>{{i + 1}}</td>
         <td>{{entry.playerOneName}}</td>
         <td>{{entry.playerTwoName}}</td>
