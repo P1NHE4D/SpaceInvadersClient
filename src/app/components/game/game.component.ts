@@ -2,7 +2,6 @@ import {Component, ElementRef, HostListener, Input, OnInit, ViewChild} from '@an
 import {LoaderService} from "../../services/loader.service";
 import {EnemyMetaData, GameLogicService} from "../../services/game-logic.service";
 import {Explosion} from "../../game-objects/Explosion";
-import {Location} from "@angular/common";
 import {HighScoreService} from "../../services/high-score.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {MpHighScore} from "../../models/mp-high-score";
@@ -41,7 +40,6 @@ export class GameComponent implements OnInit {
 
 
   constructor(
-    private location: Location,
     private loader: LoaderService,
     private gameLogic: GameLogicService,
     private highScoreService: HighScoreService,
@@ -165,7 +163,7 @@ export class GameComponent implements OnInit {
       }
       if(this.keys.get("w") === true && this.cooldownCountPlayerTwo === this.fireCoolDown) {
         this.cooldownCountPlayerTwo = 0;
-        this.gameLogic.fireBullet("playerTwo", this.loader.getImage("PlayerTwoBullet"), this.ctx);
+        this.gameLogic.fireBullet("playerTwo", this.loader.getImage("PlayerTwoBullet"), this.ctx, this.loader.getAudio("LaserShot"));
       }
     }
 
