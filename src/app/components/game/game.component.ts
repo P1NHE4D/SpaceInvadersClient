@@ -1,4 +1,4 @@
-import {Component, ElementRef, HostListener, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, HostListener, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {LoaderService} from "../../services/loader.service";
 import {EnemyMetaData, GameLogicService} from "../../services/game-logic.service";
 import {Explosion} from "../../game-objects/Explosion";
@@ -14,7 +14,7 @@ import {Router} from "@angular/router";
   styleUrls: ['./game.component.css'],
   providers: [GameLogicService]
 })
-export class GameComponent implements OnInit {
+export class GameComponent implements OnInit, OnDestroy {
 
   @Input() multiplayer: boolean = false;
   @ViewChild('canvas', { static: true })
@@ -30,7 +30,7 @@ export class GameComponent implements OnInit {
   private shipsSelected: boolean = false;
 
   private gameLoaded: boolean = false;
-  private gameSetup: boolean = false;
+  private stopGameLoop: boolean = false;
   private enemyMetaData: EnemyMetaData[] = [];
   private fireCoolDown: number = 25;
   private cooldownCountPlayerOne: number = 0;
@@ -83,6 +83,10 @@ export class GameComponent implements OnInit {
     this.loadGameResources();
   }
 
+  ngOnDestroy() {
+    this.stopGameLoop = true;
+  }
+
   @HostListener('document:keydown', ['$event'])
   handleKeyDown(event: KeyboardEvent): void {
     this.keys.set(event.key, true);
@@ -131,13 +135,17 @@ export class GameComponent implements OnInit {
     }
 
     this.gameLogic.spawnEnemies(this.enemyMetaData, this.ctx);
-    this.gameSetup = true;
   }
 
   /**
    * game loop handling the gameplay
    */
   gameLoop = () => {
+
+    // stops game loop if component is being destroyed
+    if (this.stopGameLoop) {
+      return;
+    }
 
     // Check for game over
     if (this.gameLogic.gameOver) {
