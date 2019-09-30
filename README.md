@@ -1,8 +1,8 @@
 # SpaceInvaders
-The space invaders application consists of a client and a server. The client is based on Angular and handles the actual gameplay, whereas the server uses ASP.NET CORE and an SQLite database to store the scores achieved by the players.
+The space invaders application consists of a client and a [server](https://github.com/P1NHE4D/SpaceInvadersServer). The client is based on Angular and handles the actual gameplay, whereas the server uses ASP.NET CORE and an SQLite database to store the scores achieved by the players.
 Hence, both the client and server have to be installed for the application to work.
 
-After installing the required packages, please refer to the [Execution](#execution) section.
+After downloading the git repositories and installing the required packages, please refer to the [Execution](#execution) section.
 
 ## Table of Contents
 1. [Client Installation Guide](#spaceinvadersclient)
@@ -64,7 +64,7 @@ sudo npm install
 
 # SpaceInvadersServer
 The git repository of the server can be found [here](https://github.com/P1NHE4D/SpaceInvadersServer).
-It is based on C# and requires the dotnet-sdk version 2.2.
+It is based on C# and requires .NET Core SDK version 2.2.
 
 ## Installation
 
@@ -85,7 +85,7 @@ sudo apt-get install dotnet-sdk-2.2
 The documentation for installing dotnet on a system running a different os can be found [here](https://dotnet.microsoft.com/download/linux-package-manager/ubuntu18-04/sdk-current).
 
 # Execution
-Since this application uses HTML5, it is strongly recommended to use the latest version of the Firefox, Chrome or Safari browser for the application to function properly. 
+Since this application uses HTML5, it is strongly recommended to use the latest version of the Firefox, Chrome or Safari browsers for the application to function properly. 
 
 ## Launch Server and Client Application
 
