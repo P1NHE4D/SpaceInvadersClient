@@ -31,7 +31,7 @@ describe('Enemy', () => {
     direction = enemy.movementDirection;
     expect(direction).toBe(Direction.LEFT);
     enemy.movementDirection = Direction.DOWN;
-    direction = enemy.movementDirection
+    direction = enemy.movementDirection;
     expect(direction).toBe(Direction.DOWN);
   });
 

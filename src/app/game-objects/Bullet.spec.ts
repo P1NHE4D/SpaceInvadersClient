@@ -19,8 +19,8 @@ describe('Bullet', () => {
   });
 
   it('should move up', () => {
-    let initialY: number = bullet.y
-    let initialX: number = bullet.x
+    let initialY: number = bullet.y;
+    let initialX: number = bullet.x;
     for (let x = 0; x < 4; ++x) {
       bullet.move(Direction.UP);
     }
@@ -32,8 +32,8 @@ describe('Bullet', () => {
   });
 
   it('should move down', () => {
-    let initialY: number = bullet.y
-    let initialX: number = bullet.x
+    let initialY: number = bullet.y;
+    let initialX: number = bullet.x;
     for (let x = 0; x < 4; ++x) {
       bullet.move(Direction.DOWN);
     }

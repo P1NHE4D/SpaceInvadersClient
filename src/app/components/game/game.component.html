@@ -5,7 +5,7 @@
       <p>Level: {{this.gameLogic.level}}</p>
     </div>
     <div class="hud-group" style="margin-left: auto">
-      <button class="btn btn-main" [class.btn-disabled]="gameLogic.soundMuted" (click)="gameLogic.switchSoundMuted()"><i class="fa" [class.fa-bell-slash-o]="gameLogic.soundMuted" [class.fa-bell-o]="!gameLogic.soundMuted"></i></button>
+      <button class="btn-switch" [class.btn-disabled]="gameLogic.soundMuted" (click)="gameLogic.switchSoundMuted()"><i class="fa" [class.fa-bell-slash-o]="gameLogic.soundMuted" [class.fa-bell-o]="!gameLogic.soundMuted"></i></button>
     </div>
   </div>
 
@@ -35,6 +35,16 @@
     <div class="flex-container-center">
 
       <h2 class="main-title mb-20" *ngIf="shipsSelected">Ready?</h2>
+      <div *ngIf="shipsSelected">
+        <label> Player 1 Controls
+          <img class="ml-2" src="/assets/game-assets/PlayerOneControls.png">
+        </label>
+      </div>
+      <div *ngIf="shipsSelected && multiplayer">
+        <label> Player 2 Controls
+          <img class="ml-2" src="/assets/game-assets/PlayerTwoControls.png">
+        </label>
+      </div>
 
       <p class="mb-10" *ngIf="!shipsSelected">Player 1: Select a Battleship</p>
       <div *ngIf="gameLoaded && !shipsSelected" class="row mb-20">
@@ -54,11 +64,11 @@
         </div>
       </div>
 
-      <div class="row">
-        <button class="btn-main-md" routerLink="/"><i class="fa fa-times"></i> Abort Mission</button>
-        <button class="btn-main-md" *ngIf="!gameLoaded" disabled><i class="fa fa-spinner fa-pulse"></i> Loading...</button>
-        <button class="btn-main-md" *ngIf="gameLoaded && !shipsSelected" (click)="setupGame(); confirmSelection();"><i class="fa fa-check"></i> Confirm</button>
-        <button class="btn-main-md" *ngIf="gameLoaded && shipsSelected" (click)="hidePreGameModal(); gameLoop();"><i class="fa fa-rocket"></i> Launch</button>
+      <div class="row mt-10">
+        <button class="btn-main btn-md" routerLink="/"><i class="fa fa-times"></i> Abort Mission</button>
+        <button class="btn-main btn-md" *ngIf="!gameLoaded" disabled><i class="fa fa-spinner fa-pulse"></i> Loading...</button>
+        <button class="btn-main btn-md" *ngIf="gameLoaded && !shipsSelected" (click)="setupGame(); confirmSelection();"><i class="fa fa-check"></i> Confirm</button>
+        <button class="btn-main btn-md" *ngIf="gameLoaded && shipsSelected" (click)="hidePreGameModal(); gameLoop();"><i class="fa fa-rocket"></i> Launch</button>
       </div>
 
     </div>
@@ -73,14 +83,14 @@
       <h3>Score: {{this.gameLogic.getTotalScore()}} </h3>
 
       <form *ngIf="!multiplayer" [formGroup]="spHighScoreForm" (ngSubmit)="submitHighScore()">
-        <input formControlName="playerOneName" type="text" class="custom-input mt-20" placeholder="Player 1 Name" required>
-        <button class="btn btn-main-md mt-20" type="submit" [disabled]="!spHighScoreForm.valid">Submit</button>
+        <input formControlName="playerOneName" type="text" class="player-input mt-20" placeholder="Player 1 Name" required>
+        <button class="btn-main btn-md mt-20" type="submit" [disabled]="!spHighScoreForm.valid">Submit</button>
       </form>
 
       <form *ngIf="multiplayer" [formGroup]="mpHighScoreForm" (ngSubmit)="submitHighScore()">
-        <input formControlName="playerOneName" type="text" class="custom-input mt-20" placeholder="Player 1 Name" required>
-        <input formControlName="playerTwoName" type="text" class="custom-input mt-20 mb-20" placeholder="Player 2 Name" required>
-        <button class="btn btn-main-md mt-20" type="submit" [disabled]="!mpHighScoreForm.valid">Submit</button>
+        <input formControlName="playerOneName" type="text" class="player-input mt-20" placeholder="Player 1 Name" required>
+        <input formControlName="playerTwoName" type="text" class="player-input mt-20 mb-20" placeholder="Player 2 Name" required>
+        <button class="btn-main btn-md mt-20" type="submit" [disabled]="!mpHighScoreForm.valid">Submit</button>
       </form>
     </div>
 

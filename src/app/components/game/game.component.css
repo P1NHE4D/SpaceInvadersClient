@@ -12,12 +12,37 @@ p {
   color: #ffffff;
 }
 
-.red {
-  color: #FF0000;
+label {
+  font-family: "American Captain";
+  font-size: 16pt;
+  color: #FFFFFF;
 }
 
-.blue {
-  color: #0047B0;
+input.player-input {
+  background: none;
+  padding: 0;
+  margin: 0;
+  width: 300px;
+  border: none;
+  border-bottom: solid 1pt rgba(255, 0, 0, 0.5);
+  color: #ffffff;
+  font-family: "American Captain";
+  font-size: 20pt;
+}
+
+input.player-input:focus {
+  outline: none;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.display-hidden {
+  display: none !important;
 }
 
 .game-container {
@@ -69,15 +94,4 @@ p {
 
 .preview-tile:hover {
   cursor: pointer;
-}
-
-.display-hidden {
-  display: none;
-}
-
-form {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
 }

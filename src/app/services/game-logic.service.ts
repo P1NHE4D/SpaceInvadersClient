@@ -342,10 +342,38 @@ export class GameLogicService {
   }
 
   /**
+   * @return returns all enemies currently in the game
+   */
+  get enemies(): Enemy[] {
+    return this._enemies;
+  }
+
+  /**
+   * @return returns all enemy bullets currently in game
+   */
+  get enemyBullets(): Bullet[] {
+    return this._enemyBullets;
+  }
+
+  /**
+   * @return returns all explosions currently in game
+   */
+  get explosions(): Explosion[] {
+    return this._explosions;
+  }
+
+  /**
    * @return game over
    */
   get gameOver(): boolean {
     return this._gameOver;
+  }
+
+  /**
+   * @return returns the current level of the game
+   */
+  get level(): number {
+    return this._level;
   }
 
   /**
@@ -399,33 +427,8 @@ export class GameLogicService {
   }
 
   /**
-   * @return returns all enemies currently in the game
+   * @return returns if the sound is muted or not
    */
-  get enemies(): Enemy[] {
-    return this._enemies;
-  }
-
-  /**
-   * @return returns all enemy bullets currently in game
-   */
-  get enemyBullets(): Bullet[] {
-    return this._enemyBullets;
-  }
-
-  /**
-   * @return returns all explosions currently in game
-   */
-  get explosions(): Explosion[] {
-    return this._explosions;
-  }
-
-  /**
-   * @return returns the current level of the game
-   */
-  get level(): number {
-    return this._level;
-  }
-
   get soundMuted(): boolean {
     return this._soundMuted;
   }

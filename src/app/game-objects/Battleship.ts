@@ -46,14 +46,18 @@ export class Battleship extends MovableGameObject {
     }
   }
 
-  get score(): number {
-    return this._score;
-  }
-
+  /**
+   * Adds the given points to the score
+   * @param points number of points to be added
+   */
   addToScore(points: number) {
     this._score += points;
   }
 
+  /**
+   * Subtracts the given points from the score, if the score is greater than zero
+   * @param points number of points to be subtracted
+   */
   subtractFromScore(points: number) {
     if (this._score  - points >= 0) {
       this._score -= points;
@@ -63,18 +67,34 @@ export class Battleship extends MovableGameObject {
 
   }
 
-  get lives(): number {
-    return this._lives;
+  /**
+   * Adds one life
+   */
+  addLife(): void {
+    ++this._lives;
   }
 
+  /**
+   * Removes one life if the number of lives remaining is greater than zero
+   */
   removeLife(): void {
     if (this._lives > 0) {
       --this._lives;
     }
   }
 
-  addLife(): void {
-    ++this._lives;
+  /**
+   * @return returns the number of lives
+   */
+  get lives(): number {
+    return this._lives;
+  }
+
+  /**
+   * @return returns the score of the player
+   */
+  get score(): number {
+    return this._score;
   }
 
 }

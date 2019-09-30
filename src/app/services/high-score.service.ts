@@ -19,8 +19,8 @@ export class HighScoreService {
   ) { }
 
   /**
-   * Adds a high score entry to the database
-   * @param highScoreEntry single or multi player high score
+   * Adds a single player high score entry to the database
+   * @param highScoreEntry single player high score
    */
   addSpHighScore<T extends SpHighScore>(highScoreEntry: T): Observable<T> {
     return this.http.post<T>(`${this.BASEURL}/sp-high-score`, highScoreEntry, this.HTTPOPTIONS).pipe(
@@ -28,6 +28,10 @@ export class HighScoreService {
     );
   }
 
+  /**
+   * Adds a multi player high score entry tp the database
+   * @param highScoreEntry  multi player high score
+   */
   addMpHighScore<T extends MpHighScore>(highScoreEntry: T): Observable<T> {
     return this.http.post<T>(`${this.BASEURL}/mp-high-score`, highScoreEntry, this.HTTPOPTIONS).pipe(
       catchError(this.handleError<T>())

@@ -182,14 +182,15 @@ describe('GameLogicService', () => {
 
   it('should detect player bullet intersections', () => {
     let enemyX: number = 100;
-    let bulletY: number = 100;
-    let enemyY: number = 130;
+    let enemyY: number = 100;
+    let bulletY: number = 130;
     service.enemies.push(new Enemy(enemyImage, ctx, enemyX, enemyY, 40));
-    service.spawnPlayer("testPlayer", playerImage, ctx, enemyX, bulletY);
+    service.spawnPlayer("testPlayer", playerImage, ctx);
     service.playerBullets.get("testPlayer").push(new Bullet(bulletImage, ctx, enemyX, bulletY));
     let bulletSpeed: number = service.playerBullets.get("testPlayer")[0].movementSpeed;
-    for (let i = bulletY; i <= enemyY; i += bulletSpeed) {
+    for (let i = bulletY; i > enemyY + enemyImage.height; i -= bulletSpeed) {
       service.movePlayerBullets();
+      service.checkForPlayerBulletIntersections(explosionImage, ctx, 32, 1);
     }
     expect(service.playerBullets.get("testPlayer").length).toBe(0);
     expect(service.enemies.length).toBe(0);
@@ -197,15 +198,16 @@ describe('GameLogicService', () => {
 
   it('should detect enemy bullet intersections', () => {
     let playerX: number = 100;
-    let playerY: number = 100;
-    let bulletY: number = 130;
+    let playerY: number = 130;
+    let bulletY: number = 100;
     service.enemyBullets.push(new Bullet(bulletImage, ctx, playerX, bulletY));
     service.spawnPlayer("testPlayer", playerImage, ctx, playerX, playerY);
     let bulletSpeed: number = service.enemyBullets[0].movementSpeed;
 
     let initPlayerLives: number = service.players.get("testPlayer").lives;
-    for (let i = bulletY; bulletY >= playerY; i -= bulletSpeed) {
+    for (let i = bulletY; i <= playerY; i += bulletSpeed) {
       service.moveEnemyBullets();
+      service.checkForEnemyBulletIntersections(explosionImage, ctx, 32, 1);
     }
     expect(service.enemyBullets.length).toBe(0);
     expect(service.players.get("testPlayer").lives).toBe(initPlayerLives - 1);

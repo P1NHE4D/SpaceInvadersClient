@@ -1,5 +1,4 @@
-/* You can add global styles to this file, and also import other style files */
-/* TODO: Restructure */
+/* Global styles */
 
 html, body {
   height: 100%;
@@ -10,15 +9,6 @@ html, body {
 @font-face {
   font-family: "American Captain";
   src: url('assets/fonts/american_captain-webfont.woff');
-}
-
-.main-title {
-  background: -webkit-linear-gradient(#FF0000, rgba(221, 0, 0, 0));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-family: "American Captain";
-  font-style: normal;
-  margin-bottom: 75px;
 }
 
 h1.main-title {
@@ -38,56 +28,41 @@ h3 {
   color: #FFFFFF;
 }
 
-.btn-main-lg {
+.btn-main {
   font-family: "American Captain";
   background-color: rgba(255, 0, 0, 0.5);
   color: #ffffff;
   border: solid rgba(255, 0, 0, 0);
-  font-size: 28pt;
   padding-bottom: 0;
   padding-top: 0;
+}
+
+.btn-main:hover {
+  background-color: rgba(41, 41, 41, 0.8);
+  color: #ffffff;
+  border: solid rgba(41, 41, 41, 0);
+}
+
+.btn-main:disabled {
+  background-color: rgba(41, 41, 41, 0.8);
+  color: #ffffff;
+  border: solid rgba(41, 41, 41, 0);
+}
+
+.btn-lg {
+  font-size: 28pt;
   margin: 10px 10px 10px 10px;
   width: 300px;
   min-height: 60px;
 }
 
-.btn-main-lg:hover {
-  background-color: rgba(41, 41, 41, 0.8);
-  color: #ffffff;
-  border: solid rgba(41, 41, 41, 0);
-}
-
-.btn-main-lg:disabled {
-  background-color: rgba(41, 41, 41, 0.8);
-  color: #ffffff;
-  border: solid rgba(41, 41, 41, 0);
-}
-
-.btn-main-md {
-  font-family: "American Captain";
-  background-color: rgba(255, 0, 0, 0.5);
-  color: #ffffff;
-  border: solid rgba(255, 0, 0, 0);
+.btn-md {
   font-size: 20pt;
-  padding-bottom: 0;
-  padding-top: 0;
   margin: 10px 10px 10px 10px;
   width: 200px;
 }
 
-.btn-main-md:hover {
-  background-color: rgba(41, 41, 41, 0.8);
-  color: #ffffff;
-  border: solid rgba(41, 41, 41, 0);
-}
-
-.btn-main-md:disabled {
-  background-color: rgba(41, 41, 41, 0.8);
-  color: #ffffff;
-  border: solid rgba(41, 41, 41, 0);
-}
-
-.btn-main {
+.btn-switch {
   font-family: "American Captain";
   background-color: rgba(255, 0, 0, 0.5);
   color: #ffffff;
@@ -98,14 +73,25 @@ h3 {
   margin: 0;
 }
 
-.btn-main:hover{
+.btn-switch:hover{
   color: #FFFFFF;
+}
+
+.display-block {
+  display: block;
 }
 
 .btn-disabled {
   background-color: rgba(41, 41, 41, 0.8);
   color: #ffffff;
   border: solid rgba(41, 41, 41, 0);
+}
+
+.center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .earth-background {
@@ -131,52 +117,17 @@ h3 {
   justify-content: center;
 }
 
-.modal {
-  display: none; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
-  left: 0;
-  top: 0;
-  width: 100%; /* Full _width */
-  height: 100%; /* Full _height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgb(0,0,0); /* Fallback color */
-  background-color: rgba(0,0,0,0.7); /* Black w/ opacity */
-}
-
-.modal-content {
-  background-color: #ffffff;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 400px;
-  box-shadow: 0 0 10px 0 #888888;;
-}
-
-.center {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-}
-
-input.custom-input {
-  background: none;
-  padding: 0;
-  margin: 0;
-  width: 300px;
-  border: none;
-  border-bottom: solid 1pt rgba(255, 0, 0, 0.5);
-  color: #ffffff;
+.main-title {
+  background: -webkit-linear-gradient(#FF0000, rgba(221, 0, 0, 0));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   font-family: "American Captain";
-  font-size: 20pt;
+  font-style: normal;
+  margin-bottom: 75px;
 }
 
-input.custom-input:focus {
-  outline: none;
-}
-
-.mt-20 {
-  margin-top: 20px !important;
+.mb-10 {
+  margin-bottom: 10px !important;
 }
 
 .mb-20 {
@@ -187,8 +138,29 @@ input.custom-input:focus {
   margin-top: 10px !important;
 }
 
-.mb-10 {
-  margin-bottom: 10px !important;
+.mt-20 {
+  margin-top: 20px !important;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0,0,0);
+  background-color: rgba(0,0,0,0.7);
+}
+
+.modal-content {
+  background-color: #ffffff;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 400px;
+  box-shadow: 0 0 10px 0 #888888;;
 }
 
 ::-webkit-scrollbar {
@@ -204,23 +176,3 @@ input.custom-input:focus {
   background: #FF0000;
 }
 
-.flex-container-left {
-  display: -webkit-box;
-  display: -moz-box;
-  display: -ms-flexbox;
-  display: -webkit-flex;
-  display: flex;
-  height: 100%;
-  padding: 0;
-  margin: 0;
-  flex-direction: column;
-  justify-content: left;
-}
-
-.left {
-  float: left;
-}
-
-.right {
-  float: right;
-}

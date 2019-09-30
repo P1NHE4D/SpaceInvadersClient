@@ -16,6 +16,9 @@ export abstract class MovableGameObject extends GameObject {
 
   abstract move(direction: Direction);
 
+  /**
+   * @return returns the movement speed of the object
+   */
   get movementSpeed(): number {
     return this._movementSpeed;
   }

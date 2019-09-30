@@ -48,6 +48,7 @@ export class GameComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    // Forms setup
     this.spHighScoreForm = this.formBuilder.group({
       playerOneName: ['', Validators.compose([Validators.required, Validators.maxLength(20)])]
     });
@@ -55,10 +56,14 @@ export class GameComponent implements OnInit {
       playerOneName: ['', Validators.compose([Validators.required, Validators.maxLength(20)])],
       playerTwoName: ['', Validators.compose([Validators.required, Validators.maxLength(20)])]
     });
+
+    // Canvas setup
     const canvasEl: HTMLCanvasElement = this.canvas.nativeElement;
     this.ctx = canvasEl.getContext('2d');
     this.ctx.canvas.width = 700;
     this.ctx.canvas.height = 400;
+
+    // Load and setup resources
     this.loader.resourcesLoaded$.subscribe( () => {
       this.availableBattleships.push(
         this.loader.getImage('RedFighter'),
@@ -109,7 +114,9 @@ export class GameComponent implements OnInit {
     ]);
   }
 
-  // Spawns player(s) and enemies
+  /**
+   * Spawns player(s) and enemies
+   */
   setupGame(): void {
 
     let playerImage = this.playerOneSelectedBattleship;
@@ -127,9 +134,10 @@ export class GameComponent implements OnInit {
     this.gameSetup = true;
   }
 
+  /**
+   * game loop handling the gameplay
+   */
   gameLoop = () => {
-    //TODO: spawn special enemies, e.g. ISS, UFO, nyan-nyan cat
-    //TODO: add background music
 
     // Check for game over
     if (this.gameLogic.gameOver) {
@@ -187,27 +195,39 @@ export class GameComponent implements OnInit {
   };
 
 
-  // hides the pre-game modal window
+  /**
+   * hides the pre-game modal window
+   */
   hidePreGameModal(): void {
     this.displayPreGameModal = 'none';
   }
 
-  // sets the battleship image selected by player one
+  /**
+   * sets the battleship image selected by player one
+   * @param image selected image
+   */
   selectPlayerOneShip(image: HTMLImageElement): void {
     this.playerOneSelectedBattleship = image;
   }
 
-  // sets the battleship image selected by player two
+  /**
+   * sets the battleship image selected by player two
+   * @param image selected image
+   */
   selectPlayerTwoShip(image: HTMLImageElement): void {
     this.playerTwoSelectedBattleship = image;
   }
 
-  // confirms the ship selection
+  /**
+   * confirms the ship selection
+   */
   confirmSelection(): void {
     this.shipsSelected = true;
   }
 
-  // Submits high score to server
+  /**
+   * Submits high score to server
+   */
   submitHighScore(): void {
     let playerOneName: string;
     let score = this.gameLogic.getPlayerScore("playerOne");

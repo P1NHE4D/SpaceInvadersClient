@@ -1,3 +1,12 @@
+p {
+  padding: 0;
+  margin: 0;
+  font-family: "American Captain";
+  font-size: 20pt;
+  color: #ffffff;
+  float: left;
+}
+
 table {
   display: block;
   font-family: "American Captain";
@@ -12,12 +21,6 @@ th, td {
 
 tr {
   width: 100%;
-}
-
-.score-table {
-  background-color: rgba(0,0,0,0.65);
-  margin: 0;
-  width: 50%;
 }
 
 thead {
@@ -36,11 +39,8 @@ tbody {
   font-size: 16pt;
 }
 
-p {
-  padding: 0;
+.score-table {
+  background-color: rgba(0,0,0,0.65);
   margin: 0;
-  font-family: "American Captain";
-  font-size: 20pt;
-  color: #ffffff;
-  float: left;
+  width: 50%;
 }
