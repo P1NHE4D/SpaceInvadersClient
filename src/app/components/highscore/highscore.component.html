@@ -47,7 +47,7 @@
 
 </div>
 
-<div class="modal" [class.display-block]="!spHighScores && !mpHighScores">
+<div class="modal" [class.display-block]="!spHighScores || !mpHighScores">
   <div class="center">
       <i class="fa fa-spinner fa-pulse" [ngStyle]="{fontSize: '60pt', color: '#FFFFFF'}"> </i>
   </div>

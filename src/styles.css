@@ -78,7 +78,7 @@ h3 {
 }
 
 .display-block {
-  display: block;
+  display: block !important;
 }
 
 .btn-disabled {
