@@ -85,7 +85,7 @@ sudo apt-get install dotnet-sdk-2.2
 The documentation for installing dotnet on a system running a different os can be found [here](https://dotnet.microsoft.com/download/linux-package-manager/ubuntu18-04/sdk-current).
 
 # Execution
-Since this application uses HTML5, it is strongly recommended to use the latest version of the Firefox, Chrome or Safari browser for the application to function properly. 
+Since this application uses HTML5, it is strongly recommended to use the latest version of the Firefox, Chrome or Safari browsers for the application to function properly. 
 
 ## Launch Server and Client Application
 
