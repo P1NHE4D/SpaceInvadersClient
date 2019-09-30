@@ -64,7 +64,7 @@ sudo npm install
 
 # SpaceInvadersServer
 The git repository of the server can be found [here](https://github.com/P1NHE4D/SpaceInvadersServer).
-It is based on C# and requires the dotnet-sdk version 2.2.
+It is based on C# and requires .NET Core SDK version 2.2.
 
 ## Installation
 
