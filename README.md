@@ -4,6 +4,19 @@ Hence, both the client and server have to be installed for the application to wo
 
 After downloading the git repositories and installing the required packages, please refer to the [Execution](#execution) section.
 
+<img src="SampleImages/Img1.png"
+     alt="Img1"
+     height="300px" />
+<img src="SampleImages/Img2.png"
+     alt="Img1"
+     height="300px" />
+<img src="SampleImages/Img4.png"
+     alt="Img1"
+     height="300px" />
+<img src="SampleImages/Img3.png"
+     alt="Img1"
+     height="300px" />
+
 ## Table of Contents
 1. [Client Installation Guide](#spaceinvadersclient)
 2. [Server Installation Guide](#spaceinvadersserver)
