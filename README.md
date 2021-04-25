@@ -1,5 +1,5 @@
 # SpaceInvaders
-With the help of this project, I won the third place in the 2019 Airbus Code Competition in Germany. It is a simple, web-based implementation of the well-known space invaders game, featuring a local multiplayer and multiple difficulty levels.
+This was my submission to the 2019 Airbus Code Competition in Germany, where I achieved the third place. It is a simple, web-based implementation of the well-known space invaders game, featuring a local multiplayer and multiple difficulty levels.
 
 The space invaders application consists of a client and a [server](https://github.com/P1NHE4D/SpaceInvadersServer). The client is based on Angular and handles the actual gameplay, whereas the server uses ASP.NET CORE and an SQLite database to store the scores achieved by the players.
 Hence, both the client and server have to be installed for the application to work.
